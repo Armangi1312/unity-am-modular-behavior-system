@@ -1,9 +1,9 @@
 ﻿namespace AM.Core
 {
-    public interface IRegistry<TTarget> where TTarget : class
+    public interface IRegistry<TTarget>
     {
-        void Register<T>(T context) where T : class, TTarget;
-        T Get<T>() where  T : class, TTarget;
-        bool TryGet<T>(out T context) where T : class, TTarget;
+        void Register<T>(T context) where T : TTarget;
+        T Get<T>() where  T : TTarget;
+        bool TryGet<T>(out T context) where T : TTarget;
     }
 }

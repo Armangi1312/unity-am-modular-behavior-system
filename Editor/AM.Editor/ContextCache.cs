@@ -8,18 +8,19 @@ using UnityEditor;
 namespace AM.Editor
 {
     [InitializeOnLoad]
-    internal static class ProcessorCache
+    internal static class ContextCache
     {
-        public static readonly IReadOnlyList<Type> ProcessorTypes;
+        public static readonly IReadOnlyList<Type> ContextTypes;
 
         private static readonly Dictionary<Type, List<Type>> filterCache = new();
+
         private static readonly object cacheLock = new();
 
         private static readonly List<Type> emptyList = new(0);
 
-        static ProcessorCache()
+        static ContextCache()
         {
-            ProcessorTypes = FindProcessorTypes();
+            ContextTypes = FindContextTypes();
 
             AssemblyReloadEvents.afterAssemblyReload += () =>
             {
@@ -30,7 +31,7 @@ namespace AM.Editor
             };
         }
 
-        public static List<Type> GetFilteredProcessorTypes(Type targetType)
+        public static List<Type> GetFilteredContextTypes(Type targetType)
         {
             if (targetType == null)
                 return emptyList;
@@ -53,37 +54,33 @@ namespace AM.Editor
 
             bool isGenericTarget = targetType.IsGenericTypeDefinition;
 
-            for (int i = 0; i < ProcessorTypes.Count; i++)
+            for (int i = 0; i < ContextTypes.Count; i++)
             {
-                var processorType = ProcessorTypes[i];
+                var ContextType = ContextTypes[i];
 
-                // 일반 상속 검사
-                if (!isGenericTarget && targetType.IsAssignableFrom(processorType))
+                if (!isGenericTarget && targetType.IsAssignableFrom(ContextType))
                 {
-                    result.Add(processorType);
+                    result.Add(ContextType);
                     continue;
                 }
 
-                // Generic Processor<T1,T2> 대응
-                var baseType = processorType.BaseType;
-
-                while (baseType != null)
+                foreach (var iface in ContextType.GetInterfaces())
                 {
-                    if (baseType.IsGenericType &&
-                        baseType.GetGenericTypeDefinition() == targetType)
+                    if (!iface.IsGenericType)
+                        continue;
+
+                    if (iface.GetGenericTypeDefinition() == targetType)
                     {
-                        result.Add(processorType);
+                        result.Add(ContextType);
                         break;
                     }
-
-                    baseType = baseType.BaseType;
                 }
             }
 
             return result;
         }
 
-        private static List<Type> FindProcessorTypes()
+        private static List<Type> FindContextTypes()
         {
             var result = new List<Type>();
 
@@ -107,7 +104,7 @@ namespace AM.Editor
 
                 foreach (var type in types)
                 {
-                    if (!IsValidProcessor(type))
+                    if (!IsValidContext(type))
                         continue;
 
                     result.Add(type);
@@ -120,7 +117,7 @@ namespace AM.Editor
             return result;
         }
 
-        private static bool IsValidProcessor(Type type)
+        private static bool IsValidContext(Type type)
         {
             if (type == null) return false;
             if (!type.IsClass) return false;
@@ -128,12 +125,15 @@ namespace AM.Editor
             if (type.IsGenericType) return false;
             if (type.ContainsGenericParameters) return false;
 
-            return IsProcessorType(type);
+            return ImplementsContextInterface(type);
         }
 
-        private static bool IsProcessorType(Type type)
+        private static bool ImplementsContextInterface(Type type)
         {
-            return type.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IProcessor<,>));
+            return type.GetInterfaces().Any(i =>
+                i.IsGenericType &&
+                i.GetGenericTypeDefinition() == typeof(IContext)
+            );
         }
     }
 }

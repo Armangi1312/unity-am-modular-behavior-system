@@ -5,7 +5,7 @@ using UnityEngine;
 namespace AM.Core
 {
     [Serializable]
-    public sealed class Registry<TTarget> : IRegistry<TTarget>, ISerializationCallbackReceiver where TTarget : class
+    public sealed class Registry<TTarget> : IRegistry<TTarget>, ISerializationCallbackReceiver
     {
         [SerializeReference]
         private List<TTarget> serializedObjects = new();
@@ -21,7 +21,7 @@ namespace AM.Core
 
         private readonly Dictionary<Type, TTarget> registries = new();
 
-        public void Register<T>(T instance) where T : class, TTarget
+        public void Register<T>(T instance) where T : TTarget
         {
             Register(typeof(T), instance);
         }
@@ -41,7 +41,7 @@ namespace AM.Core
                 SerializedObjects.Add(target);
         }
 
-        public T Get<T>() where T : class, TTarget
+        public T Get<T>() where T : TTarget
         {
             if (registries.TryGetValue(typeof(T), out var value))
                 return (T)value;
@@ -57,7 +57,7 @@ namespace AM.Core
             throw new Exception($"{type.Name} is not registered.");
         }
 
-        public bool TryGet<T>(out T value) where T : class, TTarget
+        public bool TryGet<T>(out T value) where T : TTarget
         {
             if (registries.TryGetValue(typeof(T), out var ctx))
             {
@@ -65,7 +65,7 @@ namespace AM.Core
                 return true;
             }
 
-            value = null;
+            value = default;
             return false;
         }
 

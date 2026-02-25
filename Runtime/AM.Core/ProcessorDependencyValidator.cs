@@ -9,21 +9,7 @@ namespace AM.Core
         private static readonly Dictionary<Type, Type[]> contextCache = new();
         private static readonly Dictionary<Type, Type[]> settingCache = new();
 
-        // =========================
-        // PUBLIC API
-        // =========================
-
         public static Type[] GetRequiredContexts(Type processorType)
-            => GetRequiredContextsInternal(processorType);
-
-        public static Type[] GetRequiredSettings(Type processorType)
-            => GetRequiredSettingsInternal(processorType);
-
-        // =========================
-        // INTERNAL
-        // =========================
-
-        private static Type[] GetRequiredContextsInternal(Type processorType)
         {
             if (contextCache.TryGetValue(processorType, out var cached))
                 return cached;
@@ -47,7 +33,7 @@ namespace AM.Core
             return result;
         }
 
-        private static Type[] GetRequiredSettingsInternal(Type processorType)
+        public static Type[] GetRequiredSettings(Type processorType)
         {
             if (settingCache.TryGetValue(processorType, out var cached))
                 return cached;

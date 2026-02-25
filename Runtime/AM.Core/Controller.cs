@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Collections;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -9,22 +10,40 @@ using UnityEditor.SceneManagement;
 
 namespace AM.Core
 {
-    public class Controller : MonoBehaviour
+    public abstract class Controller : MonoBehaviour
     {
-        [SerializeReference] private Registry<ISetting> settings = new();
-        [SerializeReference] private Registry<IContext> contexts = new();
-        [SerializeReference] private List<Processor> processors = new();
+#if UNITY_EDITOR
+        public abstract IList GetProcessors();
+        public abstract IList GetSettingsObjects();
+        public abstract IList GetContextObjects();
+#endif
+    }
 
-        public Registry<ISetting> Settings => settings;
-        public Registry<IContext> Contexts => contexts;
-        public IReadOnlyList<Processor> Processors => processors;
+    public abstract class Controller<TSetting, TContext, TProcessor> : Controller
+        where TSetting : class, ISetting
+        where TContext : class, IContext
+        where TProcessor : class, IProcessor<TSetting, TContext>
+    {
+        [SerializeReference] private Registry<TSetting> settings = new();
+        [SerializeReference] private Registry<TContext> contexts = new();
+        [SerializeReference] private List<TProcessor> processors = new();
 
-        private bool initialized;
-        private bool hasUpdateProcessors;
-        private bool hasFixedUpdateProcessors;
-        private bool hasLateUpdateProcessors;
+        public Registry<TSetting> Settings => settings;
+        public Registry<TContext> Contexts => contexts;
+        public IReadOnlyList<TProcessor> Processors => processors;
+
+        protected bool Initialized;
+
+        #region Editor Code
 
 #if UNITY_EDITOR
+
+#if UNITY_EDITOR
+        public override IList GetSettingsObjects() => settings.SerializedObjects;
+        public override IList GetContextObjects() => contexts.SerializedObjects;
+        public override IList GetProcessors() => processors;
+#endif
+
         private void OnValidate()
         {
             if (Application.isPlaying)
@@ -48,11 +67,15 @@ namespace AM.Core
 
             CollectDependencies(requiredContexts, requiredSettings);
 
+            // ✅ 타입 호환성 검증
+            ValidateProcessorDependencies(requiredContexts, requiredSettings);
+
             changed |= SyncRegistry(contexts, requiredContexts);
             changed |= SyncRegistry(settings, requiredSettings);
 
             ApplyEditorChanges(changed, "Controller Auto Setup");
         }
+#endif
 
         private void EnsureCollections()
         {
@@ -72,6 +95,10 @@ namespace AM.Core
             return true;
         }
 
+        #endregion
+
+        #region Dependency Collection
+
         private void CollectDependencies(
             HashSet<Type> ctx,
             HashSet<Type> set)
@@ -90,14 +117,72 @@ namespace AM.Core
             }
         }
 
-        private void ApplyEditorChanges(bool changed, string undoName)
-        {
-            if (!changed) return;
+        #endregion
 
-            Undo.RegisterCompleteObjectUndo(this, undoName);
-            MarkDirty();
+        #region Validation
+
+        private void ValidateProcessorDependencies(
+            HashSet<Type> requiredContexts,
+            HashSet<Type> requiredSettings)
+        {
+            foreach (var type in requiredContexts)
+            {
+                if (!typeof(TContext).IsAssignableFrom(type))
+                {
+                    throw new InvalidOperationException(
+                        $"Context '{type.Name}' is not compatible with controller context '{typeof(TContext).Name}'.");
+                }
+            }
+
+            foreach (var type in requiredSettings)
+            {
+                if (!typeof(TSetting).IsAssignableFrom(type))
+                {
+                    throw new InvalidOperationException(
+                        $"Setting '{type.Name}' is not compatible with controller setting '{typeof(TSetting).Name}'.");
+                }
+            }
         }
-#endif
+
+        private void ValidateRuntimeDependencies()
+        {
+            var requiredContexts = new HashSet<Type>();
+            var requiredSettings = new HashSet<Type>();
+
+            CollectDependencies(requiredContexts, requiredSettings);
+            ValidateProcessorDependencies(requiredContexts, requiredSettings);
+        }
+
+        #endregion
+
+        #region Registry Sync
+
+        private bool SyncRegistry<T>(
+            Registry<T> registry,
+            HashSet<Type> required)
+            where T : class
+        {
+            bool changed = false;
+
+            if (registry.SerializedObjects.RemoveAll(o => o == null) > 0)
+                changed = true;
+
+            foreach (var type in required)
+            {
+                if (!registry.Contains(type))
+                {
+                    var instance = Activator.CreateInstance(type);
+                    registry.Register(type, (T)instance);
+                    changed = true;
+                }
+            }
+
+            return changed;
+        }
+
+        #endregion
+
+        #region Processor Management
 
         private bool RemoveDuplicateProcessors()
         {
@@ -133,30 +218,45 @@ namespace AM.Core
             return removed;
         }
 
-        private bool SyncRegistry<T>(
-            Registry<T> registry,
-            HashSet<Type> required)
-            where T : class
+        #endregion
+
+        #region Initialization & Execution
+
+        protected virtual void Initialize()
         {
-            bool changed = false;
+            if (Initialized) return;
+            Initialized = true;
 
-            if (registry.SerializedObjects.RemoveAll(o => o == null) > 0)
-                changed = true;
+            // 런타임에서도 안전성 보장
+            ValidateRuntimeDependencies();
 
-            foreach (var type in required)
+            foreach (var processor in processors)
             {
-                if (!registry.Contains(type))
-                {
-                    var instance = Activator.CreateInstance(type);
-                    registry.Register(type, (T)instance);
-                    changed = true;
-                }
+                if (processor == null) continue;
+                processor.Initialize(settings, contexts);
             }
-
-            return changed;
         }
 
+        protected virtual void PerformInvoke()
+        {
+            foreach (var processor in processors)
+            {
+                if (processor == null) continue;
+                processor.Process();
+            }
+        }
+
+        #endregion
+
 #if UNITY_EDITOR
+        private void ApplyEditorChanges(bool changed, string undoName)
+        {
+            if (!changed) return;
+
+            Undo.RegisterCompleteObjectUndo(this, undoName);
+            MarkDirty();
+        }
+
         private void MarkDirty()
         {
             EditorUtility.SetDirty(this);
@@ -165,71 +265,5 @@ namespace AM.Core
                 EditorSceneManager.MarkSceneDirty(gameObject.scene);
         }
 #endif
-
-        protected void Initialize()
-        {
-            if (initialized) return;
-            initialized = true;
-
-            foreach (var processor in processors)
-            {
-                if (processor == null) continue;
-
-                processor.Initialize(settings, contexts);
-
-                var timing = processor.InvokeTiming;
-
-                if ((timing & InvokeTiming.Update) != 0)
-                    hasUpdateProcessors = true;
-
-                if ((timing & InvokeTiming.FixedUpdate) != 0)
-                    hasFixedUpdateProcessors = true;
-
-                if ((timing & InvokeTiming.LateUpdate) != 0)
-                    hasLateUpdateProcessors = true;
-            }
-        }
-
-        private void Awake()
-        {
-            if (!initialized)
-                Initialize();
-
-            PerformInvoke(InvokeTiming.Awake);
-        }
-
-        private void Start() => PerformInvoke(InvokeTiming.Start);
-        private void OnEnable() => PerformInvoke(InvokeTiming.OnEnable);
-        private void OnDisable() => PerformInvoke(InvokeTiming.OnDisable);
-        private void OnDestroy() => PerformInvoke(InvokeTiming.OnDestroyed);
-
-        private void Update()
-        {
-            if (hasUpdateProcessors)
-                PerformInvoke(InvokeTiming.Update);
-        }
-
-        private void FixedUpdate()
-        {
-            if (hasFixedUpdateProcessors)
-                PerformInvoke(InvokeTiming.FixedUpdate);
-        }
-
-        private void LateUpdate()
-        {
-            if (hasLateUpdateProcessors)
-                PerformInvoke(InvokeTiming.LateUpdate);
-        }
-
-        protected void PerformInvoke(InvokeTiming timing)
-        {
-            foreach (var processor in processors)
-            {
-                if (processor == null) continue;
-
-                if ((processor.InvokeTiming & timing) != 0)
-                    processor.Process();
-            }
-        }
     }
 }
