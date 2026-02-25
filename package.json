@@ -1,0 +1,25 @@
+{
+  "name": "com.ghoonykim.am.modular-behavior-system",
+  "version": "1.0.0",
+  "displayName": "AM Modular Behavior System",
+  "description": "A lightweight, extensible runtime framework for composing modular game logic in Unity using processors and pipelines.",
+  "unity": "6000.0",
+  "documentationUrl": "https://github.com/Armangi1312/unity-am-modular-behavior-system",
+  "changelogUrl": "https://github.com/Armangi1312/unity-am-modular-behavior-system/blob/main/CHANGELOG.md",
+  "licensesUrl": "https://github.com/Armangi1312/unity-am-modular-behavior-system/blob/main/LICENSE.md",
+  "keywords": [
+    "unity",
+    "modular",
+    "behavior",
+    "pipeline",
+    "framework",
+    "gameplay",
+    "ai",
+    "controller"
+  ],
+  "author": {
+    "name": "Ghoonykim",
+    "email": "ghoonykim@gmail.com",
+    "url": "https://github.com/Armangi1312/"
+  }
+}

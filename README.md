@@ -1,0 +1,2 @@
+# Unity Modular Behavior System
+Unity AM Modular Behavior System is a lightweight, extensible runtime framework for building modular game logic. Compose behaviors using Settings, Contexts, Processors, and Pipelines with full control over execution timing. Designed for scalability, performance, and clean architecture across gameplay, AI, and systems.
