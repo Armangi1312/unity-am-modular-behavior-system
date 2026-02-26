@@ -1,0 +1,16 @@
+{
+    "name": "AM.Module",
+    "rootNamespace": "",
+    "references": [
+        "GUID:fafeef20e3931f345975669a2f9f7ca1"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
