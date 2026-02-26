@@ -130,10 +130,7 @@ namespace AM.Editor
 
         private static bool ImplementsSettingInterface(Type type)
         {
-            return type.GetInterfaces().Any(i =>
-                i.IsGenericType &&
-                i.GetGenericTypeDefinition() == typeof(ISetting)
-            );
+            return typeof(ISetting).IsAssignableFrom(type);
         }
     }
 }

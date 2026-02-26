@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-using System.Collections;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -12,38 +11,33 @@ namespace AM.Core
 {
     public abstract class Controller : MonoBehaviour
     {
-#if UNITY_EDITOR
-        public abstract IList GetProcessors();
-        public abstract IList GetSettingsObjects();
-        public abstract IList GetContextObjects();
-#endif
     }
 
-    public abstract class Controller<TSetting, TContext, TProcessor> : Controller
+    public abstract class Controller<TSetting, TContext> : Controller
         where TSetting : class, ISetting
         where TContext : class, IContext
-        where TProcessor : class, IProcessor<TSetting, TContext>
     {
         [SerializeReference] private Registry<TSetting> settings = new();
         [SerializeReference] private Registry<TContext> contexts = new();
-        [SerializeReference] private List<TProcessor> processors = new();
+        [SerializeReference] private List<IProcessor> processors = new();
 
         public Registry<TSetting> Settings => settings;
         public Registry<TContext> Contexts => contexts;
-        public IReadOnlyList<TProcessor> Processors => processors;
+
+        public IEnumerable<IProcessor<TSetting, TContext>> Processors
+        {
+            get
+            {
+                foreach (var p in processors)
+                    yield return (IProcessor<TSetting, TContext>)p;
+            }
+        }
 
         protected bool Initialized;
 
         #region Editor Code
 
 #if UNITY_EDITOR
-
-#if UNITY_EDITOR
-        public override IList GetSettingsObjects() => settings.SerializedObjects;
-        public override IList GetContextObjects() => contexts.SerializedObjects;
-        public override IList GetProcessors() => processors;
-#endif
-
         private void OnValidate()
         {
             if (Application.isPlaying)
@@ -53,10 +47,13 @@ namespace AM.Core
 
             bool changed = false;
 
+            // 🔹 Registry 중복 및 null 정리
+            changed |= RemoveDuplicateRegistryEntries(contexts);
+            changed |= RemoveDuplicateRegistryEntries(settings);
+
             if (processors.Count == 0)
             {
-                changed |= ClearRegistriesIfNeeded();
-                ApplyEditorChanges(changed, "Clear Registries");
+                ApplyEditorChanges(changed, "Controller Idle");
                 return;
             }
 
@@ -66,8 +63,6 @@ namespace AM.Core
             var requiredSettings = new HashSet<Type>();
 
             CollectDependencies(requiredContexts, requiredSettings);
-
-            // ✅ 타입 호환성 검증
             ValidateProcessorDependencies(requiredContexts, requiredSettings);
 
             changed |= SyncRegistry(contexts, requiredContexts);
@@ -82,17 +77,6 @@ namespace AM.Core
             settings ??= new();
             contexts ??= new();
             processors ??= new();
-        }
-
-        private bool ClearRegistriesIfNeeded()
-        {
-            if (contexts.SerializedObjects.Count == 0 &&
-                settings.SerializedObjects.Count == 0)
-                return false;
-
-            contexts.SerializedObjects.Clear();
-            settings.SerializedObjects.Clear();
-            return true;
         }
 
         #endregion
@@ -164,9 +148,11 @@ namespace AM.Core
         {
             bool changed = false;
 
+            // null 정리만 수행
             if (registry.SerializedObjects.RemoveAll(o => o == null) > 0)
                 changed = true;
 
+            // 필요한 타입이 없으면 추가
             foreach (var type in required)
             {
                 if (!registry.Contains(type))
@@ -178,6 +164,35 @@ namespace AM.Core
             }
 
             return changed;
+        }
+
+        private bool RemoveDuplicateRegistryEntries<T>(Registry<T> registry)
+    where T : class
+        {
+            bool removed = false;
+            var seen = new HashSet<Type>();
+
+            for (int i = registry.SerializedObjects.Count - 1; i >= 0; i--)
+            {
+                var obj = registry.SerializedObjects[i];
+
+                if (obj == null)
+                {
+                    registry.SerializedObjects.RemoveAt(i);
+                    removed = true;
+                    continue;
+                }
+
+                var type = obj.GetType();
+
+                if (!seen.Add(type))
+                {
+                    registry.SerializedObjects.RemoveAt(i);
+                    removed = true;
+                }
+            }
+
+            return removed;
         }
 
         #endregion
@@ -222,12 +237,16 @@ namespace AM.Core
 
         #region Initialization & Execution
 
+        protected virtual void Awake()
+        {
+            Initialize();
+        }
+
         protected virtual void Initialize()
         {
             if (Initialized) return;
             Initialized = true;
 
-            // 런타임에서도 안전성 보장
             ValidateRuntimeDependencies();
 
             foreach (var processor in processors)

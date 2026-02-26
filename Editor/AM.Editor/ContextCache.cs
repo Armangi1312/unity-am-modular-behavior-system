@@ -130,10 +130,7 @@ namespace AM.Editor
 
         private static bool ImplementsContextInterface(Type type)
         {
-            return type.GetInterfaces().Any(i =>
-                i.IsGenericType &&
-                i.GetGenericTypeDefinition() == typeof(IContext)
-            );
+            return typeof(IContext).IsAssignableFrom(type);
         }
     }
 }

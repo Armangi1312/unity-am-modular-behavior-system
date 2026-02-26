@@ -1,7 +1,8 @@
 using AM.Core;
 using System;
-using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
@@ -16,16 +17,16 @@ namespace AM.Editor
         private ReorderableList contextList;
 
         private SerializedProperty processorsProperty;
-        private SerializedProperty settingsSerializedObjectsProperty; 
+        private SerializedProperty settingsRootProperty;
+        private SerializedProperty contextsRootProperty;
+        private SerializedProperty settingsSerializedObjectsProperty;
         private SerializedProperty contextsSerializedObjectsProperty;
-        
-        private SerializedProperty settingsPropertyRoot;
-        private SerializedProperty contextsPropertyRoot;
-
-        private bool settingsFoldout = true;
-        private bool contextsFoldout = true;
 
         private Controller controller;
+
+        // 컨트롤러의 제네릭 인자 (예: ITestSetting, ITestContext)
+        private Type controllerSettingType;
+        private Type controllerContextType;
 
         private void OnEnable()
         {
@@ -33,330 +34,294 @@ namespace AM.Editor
             if (controller == null)
                 return;
 
-            // find processors list (field name must match exactly in the concrete controller)
+            ResolveControllerGenericTypes();
+
             processorsProperty = serializedObject.FindProperty("processors");
 
-            // settings.SerializedObjects and contexts.SerializedObjects
-            settingsPropertyRoot = serializedObject.FindProperty("settings");
-            if (settingsPropertyRoot != null)
-            {
-                settingsSerializedObjectsProperty = settingsPropertyRoot.FindPropertyRelative("SerializedObjects");
-            }
+            // Registry 필드 찾기 (Controller 내부에 있는 private fields 이름과 일치해야 함)
+            settingsRootProperty = serializedObject.FindProperty("settings");
+            contextsRootProperty = serializedObject.FindProperty("contexts");
 
-            contextsPropertyRoot = serializedObject.FindProperty("contexts");
-            if (contextsPropertyRoot != null)
-            {
-                contextsSerializedObjectsProperty = contextsPropertyRoot.FindPropertyRelative("SerializedObjects");
-            }
+            if (settingsRootProperty != null)
+                settingsSerializedObjectsProperty = settingsRootProperty.FindPropertyRelative("serializedObjects");
+
+            if (contextsRootProperty != null)
+                contextsSerializedObjectsProperty = contextsRootProperty.FindPropertyRelative("serializedObjects");
 
             if (processorsProperty != null)
-                InitializeProcessorList();
+                processorList = CreateProcessorList();
 
             if (settingsSerializedObjectsProperty != null)
-                InitializeSettingList();
+                settingList = CreateManagedReferenceList(
+                    settingsSerializedObjectsProperty,
+                    "Settings",
+                    SettingCache.SettingTypes,
+                    controllerSettingType);
 
             if (contextsSerializedObjectsProperty != null)
-                InitializeContextList();
+                contextList = CreateManagedReferenceList(
+                    contextsSerializedObjectsProperty,
+                    "Contexts",
+                    ContextCache.ContextTypes,
+                    controllerContextType);
         }
 
-        // -------------------------
-        // Processor list
-        // -------------------------
-        private void InitializeProcessorList()
+        // ============================================================
+        // Controller<TSetting, TContext>에서 제네릭 인자 찾기
+        // ============================================================
+        private void ResolveControllerGenericTypes()
         {
-            processorList = new ReorderableList(serializedObject, processorsProperty, true, true, true, true);
+            controllerSettingType = null;
+            controllerContextType = null;
 
-            processorList.drawHeaderCallback = rect => EditorGUI.LabelField(rect, "Processors");
+            Type t = controller.GetType();
 
-            processorList.drawElementCallback = (rect, index, active, focused) =>
+            while (t != null)
+            {
+                if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Controller<,>))
+                {
+                    var args = t.GetGenericArguments();
+                    controllerSettingType = args[0];
+                    controllerContextType = args[1];
+                    return;
+                }
+                t = t.BaseType;
+            }
+        }
+
+        // ============================================================
+        // Processor 리스트 (기존 로직 유지하되 보기 좋게)
+        // ============================================================
+        private ReorderableList CreateProcessorList()
+        {
+            var list = new ReorderableList(serializedObject, processorsProperty, true, true, true, true);
+
+            list.drawHeaderCallback = rect =>
+            {
+                EditorGUI.LabelField(rect, "Processors");
+            };
+
+            list.drawElementCallback = (rect, index, active, focused) =>
             {
                 var element = processorsProperty.GetArrayElementAtIndex(index);
                 rect.y += 2;
 
-                if (element != null && element.managedReferenceValue != null)
-                {
-                    var type = element.managedReferenceValue.GetType();
-                    EditorGUI.LabelField(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight),
-                        type.Name, EditorStyles.boldLabel);
-                    rect.y += EditorGUIUtility.singleLineHeight + 2;
-                }
+                // 타입 라벨
+                var obj = element.managedReferenceValue;
+                string label = obj == null ? "Null" : obj.GetType().Name;
+                EditorGUI.LabelField(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight),
+                    label, EditorStyles.boldLabel);
+                rect.y += EditorGUIUtility.singleLineHeight + 2;
 
                 EditorGUI.PropertyField(rect, element, GUIContent.none, true);
             };
 
-            processorList.elementHeightCallback = index =>
+            list.elementHeightCallback = index =>
             {
                 var element = processorsProperty.GetArrayElementAtIndex(index);
                 return EditorGUI.GetPropertyHeight(element, true) + 6f;
             };
 
-            processorList.onAddDropdownCallback = ShowProcessorMenu;
+            list.onAddDropdownCallback = (rect, l) =>
+            {
+                ShowProcessorMenu();
+            };
 
-            processorList.onRemoveCallback = list =>
+            list.onRemoveCallback = l =>
             {
                 if (EditorApplication.isPlayingOrWillChangePlaymode)
-                {
-                    Debug.LogError("[Controller] Cannot remove processors during Play Mode.", controller);
-                    EditorUtility.DisplayDialog("Modification Blocked",
-                        "Processors cannot be removed while in Play Mode.\nStop the game before editing.", "OK");
                     return;
-                }
 
-                // perform default behavior (removes the element)
-                ReorderableList.defaultBehaviours.DoRemoveButton(list);
-
+                ReorderableList.defaultBehaviours.DoRemoveButton(l);
                 serializedObject.ApplyModifiedProperties();
                 EditorUtility.SetDirty(controller);
             };
+
+            list.drawNoneElementCallback = rect =>
+            {
+                EditorGUI.LabelField(rect, "No processors. Add one with +", EditorStyles.centeredGreyMiniLabel);
+            };
+
+            return list;
         }
 
-        private void ShowProcessorMenu(Rect rect, ReorderableList list)
+        private void ShowProcessorMenu()
         {
             var menu = new GenericMenu();
+            bool any = false;
 
-            var types = ProcessorCache.ProcessorTypes;
-            if (types == null || types.Count == 0)
+            foreach (var t in ProcessorCache.ProcessorTypes)
             {
-                menu.AddDisabledItem(new GUIContent("No processors found"));
+                if (t == null || t.IsAbstract || t.IsInterface || t.ContainsGenericParameters)
+                    continue;
+
+                if (!IsCompatibleProcessorForController(t))
+                    continue;
+
+                any = true;
+                var cached = t;
+                menu.AddItem(new GUIContent(t.Name), false, () => AddManagedReference(processorsProperty, cached));
             }
-            else
-            {
-                foreach (var t in types)
-                {
-                    var cached = t;
-                    menu.AddItem(new GUIContent(t.Name), false, () => AddProcessor(cached));
-                }
-            }
+
+            if (!any)
+                menu.AddDisabledItem(new GUIContent("No compatible processors found"));
 
             menu.ShowAsContext();
         }
 
-        private void AddProcessor(Type type)
+        // Controller의 제네릭 인자와 비교해서 Processor가 호환되는지 검사
+        private bool IsCompatibleProcessorForController(Type candidate)
         {
-            if (EditorApplication.isPlayingOrWillChangePlaymode)
+            foreach (var iface in candidate.GetInterfaces())
             {
-                Debug.LogError("[Controller] Cannot add processors during Play Mode.", controller);
-                EditorUtility.DisplayDialog("Modification Blocked",
-                    "Processors cannot be added while in Play Mode.\nStop the game before editing.", "OK");
-                return;
+                if (!iface.IsGenericType) continue;
+                if (iface.GetGenericTypeDefinition() != typeof(IProcessor<,>)) continue;
+
+                var args = iface.GetGenericArguments();
+                var settingArg = args[0];
+                var contextArg = args[1];
+
+                // controllerSettingType/controllerContextType이 null이면 허용하지 않음
+                if (controllerSettingType == null || controllerContextType == null)
+                    return false;
+
+                // Controller가 요구하는 타입이 상위 타입인지(= candidate가 그것을 구현/상속)
+                bool settingMatch = controllerSettingType.IsAssignableFrom(settingArg);
+                bool contextMatch = controllerContextType.IsAssignableFrom(contextArg);
+
+                if (settingMatch && contextMatch) return true;
             }
 
-            Undo.RecordObject(controller, "Add Processor");
-            serializedObject.Update();
-
-            int index = processorsProperty.arraySize;
-            processorsProperty.InsertArrayElementAtIndex(index);
-
-            var element = processorsProperty.GetArrayElementAtIndex(index);
-            element.managedReferenceValue = Activator.CreateInstance(type);
-
-            serializedObject.ApplyModifiedProperties();
-            EditorUtility.SetDirty(controller);
+            return false;
         }
 
-        // -------------------------
-        // Setting list (Registry.SerializedObjects)
-        // -------------------------
-        private void InitializeSettingList()
+        // ============================================================
+        // Generic ManagedReference 리스트 생성 (Settings / Contexts)
+        // ============================================================
+        private ReorderableList CreateManagedReferenceList(
+            SerializedProperty arrayProperty,
+            string header,
+            IEnumerable<Type> candidateTypes,
+            Type expectedType)
         {
-            settingList = new ReorderableList(serializedObject, settingsSerializedObjectsProperty, true, true, true, true);
+            var list = new ReorderableList(serializedObject, arrayProperty, true, true, true, true);
 
-            settingList.drawHeaderCallback = rect => EditorGUI.LabelField(rect, "Settings");
-
-            settingList.drawElementCallback = (rect, index, active, focused) =>
+            list.drawHeaderCallback = rect =>
             {
-                var element = settingsSerializedObjectsProperty.GetArrayElementAtIndex(index);
+                EditorGUI.LabelField(rect, header);
+            };
+
+            list.drawElementCallback = (rect, index, active, focused) =>
+            {
+                var element = arrayProperty.GetArrayElementAtIndex(index);
                 rect.y += 2;
 
-                if (element != null && element.managedReferenceValue != null)
-                {
-                    var type = element.managedReferenceValue.GetType();
-                    EditorGUI.LabelField(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight),
-                        type.Name, EditorStyles.boldLabel);
-                    rect.y += EditorGUIUtility.singleLineHeight + 2;
-                }
+                var obj = element.managedReferenceValue;
+                string label = obj == null ? "Null" : obj.GetType().Name;
+
+                // 실제 타입 이름을 큰 글씨로
+                EditorGUI.LabelField(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight),
+                    label, EditorStyles.boldLabel);
+                rect.y += EditorGUIUtility.singleLineHeight + 2;
 
                 EditorGUI.PropertyField(rect, element, GUIContent.none, true);
             };
 
-            settingList.elementHeightCallback = index =>
+            list.elementHeightCallback = index =>
             {
-                var element = settingsSerializedObjectsProperty.GetArrayElementAtIndex(index);
-                return EditorGUI.GetPropertyHeight(element, true) + 6f;
+                var element = arrayProperty.GetArrayElementAtIndex(index);
+                return EditorGUI.GetPropertyHeight(element, true) + 22f;
             };
 
-            settingList.onAddDropdownCallback = ShowSettingMenu;
-
-            settingList.onRemoveCallback = list =>
+            list.drawNoneElementCallback = rect =>
             {
-                if (EditorApplication.isPlayingOrWillChangePlaymode)
-                {
-                    Debug.LogError("[Controller] Cannot remove settings during Play Mode.", controller);
-                    EditorUtility.DisplayDialog("Modification Blocked",
-                        "Settings cannot be removed while in Play Mode.\nStop the game before editing.", "OK");
-                    return;
-                }
-
-                ReorderableList.defaultBehaviours.DoRemoveButton(list);
-                serializedObject.ApplyModifiedProperties();
-                EditorUtility.SetDirty(controller);
+                EditorGUI.LabelField(rect, $"No {header.ToLower()}. Add one with +", EditorStyles.centeredGreyMiniLabel);
             };
-        }
 
-        private void ShowSettingMenu(Rect rect, ReorderableList list)
-        {
-            var menu = new GenericMenu();
-
-            // assume SettingCache.SettingTypes exists and contains Type[]
-            var types = SettingCache.SettingTypes;
-
-            if (types == null || types.Count == 0)
+            list.onAddDropdownCallback = (rect, l) =>
             {
-                menu.AddDisabledItem(new GUIContent("No settings found"));
-            }
-            else
-            {
+                var menu = new GenericMenu();
                 bool any = false;
-                foreach (var t in types)
+
+                foreach (var t in candidateTypes)
                 {
-                    if (t.IsAbstract || t.IsInterface) continue;
+                    if (t == null || t.IsAbstract || t.IsInterface || t.ContainsGenericParameters)
+                        continue;
+
+                    if (!IsCandidateAssignableToExpected(t, expectedType))
+                        continue;
+
                     any = true;
                     var cached = t;
-                    menu.AddItem(new GUIContent(t.Name), false, () => AddSetting(cached));
+                    menu.AddItem(new GUIContent(t.Name), false, () => AddManagedReference(arrayProperty, cached));
                 }
 
-                if (!any) menu.AddDisabledItem(new GUIContent("No concrete settings found"));
-            }
+                if (!any)
+                    menu.AddDisabledItem(new GUIContent("No compatible types found"));
 
-            menu.ShowAsContext();
+                menu.ShowAsContext();
+            };
+
+            return list;
         }
 
-        private void AddSetting(Type type)
+        // Settings/Contexts 후보 타입이 expectedType 기준에서 허용되는지 검사
+        private bool IsCandidateAssignableToExpected(Type candidate, Type expectedType)
         {
-            if (EditorApplication.isPlayingOrWillChangePlaymode)
+            if (expectedType == null)
+                return false;
+
+            // 기본적 케이스: expectedType이 상위 타입(인터페이스 또는 base class)인 경우
+            if (expectedType.IsAssignableFrom(candidate))
+                return true;
+
+            // 보수적 보완: candidate가 인터페이스를 통해 expectedType을 구현하는지 확인 (대부분 IsAssignableFrom으로 커버되지만 안전하게 한 번 더 검사)
+            var ifaces = candidate.GetInterfaces();
+            if (ifaces.Any(i => i == expectedType))
+                return true;
+
+            // generic interface 등 특수 케이스에 대해 추가 검사 (예: 열린/닫힌 generic 정의 매칭)
+            if (expectedType.IsGenericTypeDefinition)
             {
-                Debug.LogError("[Controller] Cannot add settings during Play Mode.", controller);
-                EditorUtility.DisplayDialog("Modification Blocked",
-                    "Settings cannot be added while in Play Mode.\nStop the game before editing.", "OK");
-                return;
+                foreach (var iface in candidate.GetInterfaces())
+                {
+                    if (!iface.IsGenericType) continue;
+                    if (iface.GetGenericTypeDefinition() == expectedType) return true;
+                }
             }
 
-            Undo.RecordObject(controller, "Add Setting");
+            // 추가적으로, expectedType이 concrete 타입이고 candidate가 expectedType의 base 타입이라서 양방향 허용을 원하면 아래를 활성화
+            // if (candidate.IsAssignableFrom(expectedType)) return true;
+
+            return false;
+        }
+
+        // ============================================================
+        // element 추가(SerializeReference)
+        // ============================================================
+        private void AddManagedReference(SerializedProperty arrayProperty, Type type)
+        {
+            if (EditorApplication.isPlayingOrWillChangePlaymode)
+                return;
+
+            Undo.RecordObject(controller, "Add Element");
             serializedObject.Update();
 
-            int index = settingsSerializedObjectsProperty.arraySize;
-            settingsSerializedObjectsProperty.InsertArrayElementAtIndex(index);
+            int index = arrayProperty.arraySize;
+            arrayProperty.InsertArrayElementAtIndex(index);
 
-            var element = settingsSerializedObjectsProperty.GetArrayElementAtIndex(index);
+            var element = arrayProperty.GetArrayElementAtIndex(index);
+
+            // CreateInstance로 인스턴스 생성해서 managedReferenceValue에 할당
             element.managedReferenceValue = Activator.CreateInstance(type);
 
             serializedObject.ApplyModifiedProperties();
             EditorUtility.SetDirty(controller);
         }
 
-        // -------------------------
-        // Context list (Registry.SerializedObjects)
-        // -------------------------
-        private void InitializeContextList()
-        {
-            contextList = new ReorderableList(serializedObject, contextsSerializedObjectsProperty, true, true, true, true);
-
-            contextList.drawHeaderCallback = rect => EditorGUI.LabelField(rect, "Contexts");
-
-            contextList.drawElementCallback = (rect, index, active, focused) =>
-            {
-                var element = contextsSerializedObjectsProperty.GetArrayElementAtIndex(index);
-                rect.y += 2;
-
-                if (element != null && element.managedReferenceValue != null)
-                {
-                    var type = element.managedReferenceValue.GetType();
-                    EditorGUI.LabelField(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight),
-                        type.Name, EditorStyles.boldLabel);
-                    rect.y += EditorGUIUtility.singleLineHeight + 2;
-                }
-
-                EditorGUI.PropertyField(rect, element, GUIContent.none, true);
-            };
-
-            contextList.elementHeightCallback = index =>
-            {
-                var element = contextsSerializedObjectsProperty.GetArrayElementAtIndex(index);
-                return EditorGUI.GetPropertyHeight(element, true) + 6f;
-            };
-
-            contextList.onAddDropdownCallback = ShowContextMenu;
-
-            contextList.onRemoveCallback = list =>
-            {
-                if (EditorApplication.isPlayingOrWillChangePlaymode)
-                {
-                    Debug.LogError("[Controller] Cannot remove contexts during Play Mode.", controller);
-                    EditorUtility.DisplayDialog("Modification Blocked",
-                        "Contexts cannot be removed while in Play Mode.\nStop the game before editing.", "OK");
-                    return;
-                }
-
-                ReorderableList.defaultBehaviours.DoRemoveButton(list);
-                serializedObject.ApplyModifiedProperties();
-                EditorUtility.SetDirty(controller);
-            };
-        }
-
-        private void ShowContextMenu(Rect rect, ReorderableList list)
-        {
-            var menu = new GenericMenu();
-
-            // assume ContextCache.ContextTypes exists
-            var types = ContextCache.ContextTypes;
-
-            if (types == null || types.Count == 0)
-            {
-                menu.AddDisabledItem(new GUIContent("No contexts found"));
-            }
-            else
-            {
-                bool any = false;
-                foreach (var t in types)
-                {
-                    if (t.IsAbstract || t.IsInterface) continue;
-                    any = true;
-                    var cached = t;
-                    menu.AddItem(new GUIContent(t.Name), false, () => AddContext(cached));
-                }
-
-                if (!any) menu.AddDisabledItem(new GUIContent("No concrete contexts found"));
-            }
-
-            menu.ShowAsContext();
-        }
-
-        private void AddContext(Type type)
-        {
-            if (EditorApplication.isPlayingOrWillChangePlaymode)
-            {
-                Debug.LogError("[Controller] Cannot add contexts during Play Mode.", controller);
-                EditorUtility.DisplayDialog("Modification Blocked",
-                    "Contexts cannot be added while in Play Mode.\nStop the game before editing.", "OK");
-                return;
-            }
-
-            Undo.RecordObject(controller, "Add Context");
-            serializedObject.Update();
-
-            int index = contextsSerializedObjectsProperty.arraySize;
-            contextsSerializedObjectsProperty.InsertArrayElementAtIndex(index);
-
-            var element = contextsSerializedObjectsProperty.GetArrayElementAtIndex(index);
-            element.managedReferenceValue = Activator.CreateInstance(type);
-
-            serializedObject.ApplyModifiedProperties();
-            EditorUtility.SetDirty(controller);
-        }
-
-        // -------------------------
+        // ============================================================
         // Inspector GUI
-        // -------------------------
+        // ============================================================
         public override void OnInspectorGUI()
         {
             if (controller == null)
@@ -364,54 +329,15 @@ namespace AM.Editor
 
             serializedObject.Update();
 
-            EditorGUI.BeginChangeCheck();
-
-            GUILayout.Space(4);
             processorList?.DoLayoutList();
-
             GUILayout.Space(6);
-            settingList?.DoLayoutList();
 
-            GUILayout.Space(8);
+            settingList?.DoLayoutList();
+            GUILayout.Space(6);
+
             contextList?.DoLayoutList();
 
-            if (EditorGUI.EndChangeCheck())
-            {
-                serializedObject.ApplyModifiedProperties();
-                EditorUtility.SetDirty(controller);
-            }
-            else
-            {
-                serializedObject.ApplyModifiedProperties();
-            }
-        }
-
-        // -------------------------
-        // Registry drawer helper
-        // -------------------------
-        private void DrawRegistry(string title, ref bool foldout, IList list, bool editable)
-        {
-            if (list == null)
-            {
-                EditorGUILayout.HelpBox($"{title} not available", MessageType.Warning);
-                return;
-            }
-
-            foldout = EditorGUILayout.Foldout(foldout, title, true);
-            if (!foldout) return;
-
-            EditorGUI.indentLevel++;
-            if (list.Count == 0)
-            {
-                EditorGUILayout.LabelField("(empty)");
-            }
-            else
-            {
-                if (!editable) EditorGUI.BeginDisabledGroup(true);
-                RegistryEditorHelper.DrawSerializedObjects(list);
-                if (!editable) EditorGUI.EndDisabledGroup();
-            }
-            EditorGUI.indentLevel--;
+            serializedObject.ApplyModifiedProperties();
         }
     }
 }
