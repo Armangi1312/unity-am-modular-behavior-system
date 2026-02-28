@@ -1,11 +1,10 @@
-using AM.Core;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
+using AM.Core;
 
 namespace AM.Editor
 {
@@ -24,9 +23,10 @@ namespace AM.Editor
 
         private Controller controller;
 
-        // 컨트롤러의 제네릭 인자 (예: ITestSetting, ITestContext)
+        // Controller가 알려주는 타입들 (Controller 구현체에서 제공)
         private Type controllerSettingType;
         private Type controllerContextType;
+        private Type controllerProcessorType;
 
         private void OnEnable()
         {
@@ -34,11 +34,11 @@ namespace AM.Editor
             if (controller == null)
                 return;
 
-            ResolveControllerGenericTypes();
+            ResolveControllerTypesFromControllerAPIs();
 
+            // SerializedProperty 참조 획득
             processorsProperty = serializedObject.FindProperty("processors");
 
-            // Registry 필드 찾기 (Controller 내부에 있는 private fields 이름과 일치해야 함)
             settingsRootProperty = serializedObject.FindProperty("settings");
             contextsRootProperty = serializedObject.FindProperty("contexts");
 
@@ -48,6 +48,7 @@ namespace AM.Editor
             if (contextsRootProperty != null)
                 contextsSerializedObjectsProperty = contextsRootProperty.FindPropertyRelative("serializedObjects");
 
+            // ReorderableList 생성 (있을 때만)
             if (processorsProperty != null)
                 processorList = CreateProcessorList();
 
@@ -67,30 +68,32 @@ namespace AM.Editor
         }
 
         // ============================================================
-        // Controller<TSetting, TContext>에서 제네릭 인자 찾기
+        // Controller의 Setting/Context/Processor 타입을 Controller API에서 조회
         // ============================================================
-        private void ResolveControllerGenericTypes()
+        private void ResolveControllerTypesFromControllerAPIs()
         {
             controllerSettingType = null;
             controllerContextType = null;
+            controllerProcessorType = null;
 
-            Type t = controller.GetType();
-
-            while (t != null)
+            try
             {
-                if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Controller<,>))
-                {
-                    var args = t.GetGenericArguments();
-                    controllerSettingType = args[0];
-                    controllerContextType = args[1];
-                    return;
-                }
-                t = t.BaseType;
+                // Controller 인터페이스에서 제공하는 메서드 사용
+                controllerSettingType = controller.SettingType();
+                controllerContextType = controller.ContextType();
+                controllerProcessorType = controller.ProcessorType();
+            }
+            catch
+            {
+                // 예외 발생 시 null 허용(호환 검사에서 걸러짐)
+                controllerSettingType = null;
+                controllerContextType = null;
+                controllerProcessorType = null;
             }
         }
 
         // ============================================================
-        // Processor 리스트 (기존 로직 유지하되 보기 좋게)
+        // Processor 리스트 (ReorderableList)
         // ============================================================
         private ReorderableList CreateProcessorList()
         {
@@ -106,7 +109,7 @@ namespace AM.Editor
                 var element = processorsProperty.GetArrayElementAtIndex(index);
                 rect.y += 2;
 
-                // 타입 라벨
+                // 타입 라벨 표시
                 var obj = element.managedReferenceValue;
                 string label = obj == null ? "Null" : obj.GetType().Name;
                 EditorGUI.LabelField(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight),
@@ -150,12 +153,17 @@ namespace AM.Editor
             var menu = new GenericMenu();
             bool any = false;
 
+            // ProcessorCache에서 후보를 가져옴 (프로젝트 단위 캐시 가정)
             foreach (var t in ProcessorCache.ProcessorTypes)
             {
                 if (t == null || t.IsAbstract || t.IsInterface || t.ContainsGenericParameters)
                     continue;
 
                 if (!IsCompatibleProcessorForController(t))
+                    continue;
+
+                // 중복 방지: 이미 같은 타입이 등록되어 있으면 메뉴에 표시하지 않음
+                if (ProcessorsAlreadyContainsType(t))
                     continue;
 
                 any = true;
@@ -169,27 +177,49 @@ namespace AM.Editor
             menu.ShowAsContext();
         }
 
-        // Controller의 제네릭 인자와 비교해서 Processor가 호환되는지 검사
+        // Controller의 제약(ProcessorType, SettingType, ContextType)에 대해 후보 타입이 허용되는지 검사
         private bool IsCompatibleProcessorForController(Type candidate)
         {
+            // 기본적 안전 검사
+            if (candidate == null) return false;
+            if (controllerSettingType == null || controllerContextType == null || controllerProcessorType == null)
+                return false;
+
+            // 1) Controller가 허용한 Processor 타입 계열인지 확인
+            if (!controllerProcessorType.IsAssignableFrom(candidate))
+                return false;
+
+            // 2) IProcessor<TSetting, TContext> 인터페이스 구현 여부 확인
             foreach (var iface in candidate.GetInterfaces())
             {
                 if (!iface.IsGenericType) continue;
-                if (iface.GetGenericTypeDefinition() != typeof(IProcessor<,>)) continue;
+                var def = iface.GetGenericTypeDefinition();
+                if (def != typeof(IProcessor<,>)) continue;
 
                 var args = iface.GetGenericArguments();
                 var settingArg = args[0];
                 var contextArg = args[1];
 
-                // controllerSettingType/controllerContextType이 null이면 허용하지 않음
-                if (controllerSettingType == null || controllerContextType == null)
-                    return false;
-
-                // Controller가 요구하는 타입이 상위 타입인지(= candidate가 그것을 구현/상속)
                 bool settingMatch = controllerSettingType.IsAssignableFrom(settingArg);
                 bool contextMatch = controllerContextType.IsAssignableFrom(contextArg);
 
                 if (settingMatch && contextMatch) return true;
+            }
+
+            return false;
+        }
+
+        // processors 리스트에 이미 같은 타입이 있는지 검사
+        private bool ProcessorsAlreadyContainsType(Type type)
+        {
+            if (processorsProperty == null) return false;
+
+            for (int i = 0; i < processorsProperty.arraySize; i++)
+            {
+                var element = processorsProperty.GetArrayElementAtIndex(i);
+                var existing = element.managedReferenceValue;
+                if (existing == null) continue;
+                if (existing.GetType() == type) return true;
             }
 
             return false;
@@ -219,7 +249,7 @@ namespace AM.Editor
                 var obj = element.managedReferenceValue;
                 string label = obj == null ? "Null" : obj.GetType().Name;
 
-                // 실제 타입 이름을 큰 글씨로
+                // 실제 타입 이름을 큰 글씨로 보여줍니다.
                 EditorGUI.LabelField(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight),
                     label, EditorStyles.boldLabel);
                 rect.y += EditorGUIUtility.singleLineHeight + 2;
@@ -251,6 +281,10 @@ namespace AM.Editor
                     if (!IsCandidateAssignableToExpected(t, expectedType))
                         continue;
 
+                    // 동일 타입 중복 추가 방지
+                    if (ManagedReferenceArrayContainsType(arrayProperty, t))
+                        continue;
+
                     any = true;
                     var cached = t;
                     menu.AddItem(new GUIContent(t.Name), false, () => AddManagedReference(arrayProperty, cached));
@@ -262,6 +296,16 @@ namespace AM.Editor
                 menu.ShowAsContext();
             };
 
+            list.onRemoveCallback = l =>
+            {
+                if (EditorApplication.isPlayingOrWillChangePlaymode)
+                    return;
+
+                ReorderableList.defaultBehaviours.DoRemoveButton(l);
+                serializedObject.ApplyModifiedProperties();
+                EditorUtility.SetDirty(controller);
+            };
+
             return list;
         }
 
@@ -271,16 +315,10 @@ namespace AM.Editor
             if (expectedType == null)
                 return false;
 
-            // 기본적 케이스: expectedType이 상위 타입(인터페이스 또는 base class)인 경우
             if (expectedType.IsAssignableFrom(candidate))
                 return true;
 
-            // 보수적 보완: candidate가 인터페이스를 통해 expectedType을 구현하는지 확인 (대부분 IsAssignableFrom으로 커버되지만 안전하게 한 번 더 검사)
-            var ifaces = candidate.GetInterfaces();
-            if (ifaces.Any(i => i == expectedType))
-                return true;
-
-            // generic interface 등 특수 케이스에 대해 추가 검사 (예: 열린/닫힌 generic 정의 매칭)
+            // generic interface 등 특수 케이스에 대해 검사
             if (expectedType.IsGenericTypeDefinition)
             {
                 foreach (var iface in candidate.GetInterfaces())
@@ -290,8 +328,21 @@ namespace AM.Editor
                 }
             }
 
-            // 추가적으로, expectedType이 concrete 타입이고 candidate가 expectedType의 base 타입이라서 양방향 허용을 원하면 아래를 활성화
-            // if (candidate.IsAssignableFrom(expectedType)) return true;
+            return false;
+        }
+
+        // arrayProperty(serializedObjects)에 이미 같은 타입이 들어있는지 확인
+        private bool ManagedReferenceArrayContainsType(SerializedProperty arrayProperty, Type type)
+        {
+            if (arrayProperty == null) return false;
+
+            for (int i = 0; i < arrayProperty.arraySize; i++)
+            {
+                var el = arrayProperty.GetArrayElementAtIndex(i);
+                var existing = el.managedReferenceValue;
+                if (existing == null) continue;
+                if (existing.GetType() == type) return true;
+            }
 
             return false;
         }
@@ -304,6 +355,9 @@ namespace AM.Editor
             if (EditorApplication.isPlayingOrWillChangePlaymode)
                 return;
 
+            if (type == null) return;
+            if (type.IsAbstract || type.IsInterface || type.ContainsGenericParameters) return;
+
             Undo.RecordObject(controller, "Add Element");
             serializedObject.Update();
 
@@ -312,7 +366,7 @@ namespace AM.Editor
 
             var element = arrayProperty.GetArrayElementAtIndex(index);
 
-            // CreateInstance로 인스턴스 생성해서 managedReferenceValue에 할당
+            // 인스턴스 생성 후 managed reference에 할당합니다.
             element.managedReferenceValue = Activator.CreateInstance(type);
 
             serializedObject.ApplyModifiedProperties();
@@ -328,6 +382,15 @@ namespace AM.Editor
                 return;
 
             serializedObject.Update();
+
+            // Script 필드만 표시 (Unity 기본)
+            GUI.enabled = false;
+            EditorGUILayout.ObjectField("Script",
+                MonoScript.FromMonoBehaviour((MonoBehaviour)target),
+                typeof(MonoScript), false);
+            GUI.enabled = true;
+
+            GUILayout.Space(8);
 
             processorList?.DoLayoutList();
             GUILayout.Space(6);

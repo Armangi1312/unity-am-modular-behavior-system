@@ -11,33 +11,45 @@ namespace AM.Core
 {
     public abstract class Controller : MonoBehaviour
     {
+#if UNITY_EDITOR
+        public abstract Type SettingType();
+        public abstract Type ContextType();
+        public abstract Type ProcessorType();
+
+        public abstract object GetSetting();
+        public abstract object GetContext();
+        public abstract object GetProcessor();
+#endif
     }
 
-    public abstract class Controller<TSetting, TContext> : Controller
+    public abstract class Controller<TSetting, TContext, TProcessor> : Controller
         where TSetting : class, ISetting
         where TContext : class, IContext
+        where TProcessor : class, IProcessor
     {
-        [SerializeReference] private Registry<TSetting> settings = new();
-        [SerializeReference] private Registry<TContext> contexts = new();
-        [SerializeReference] private List<IProcessor> processors = new();
+        [SerializeReference] protected Registry<TSetting> settings = new();
+        [SerializeReference] protected Registry<TContext> contexts = new();
+        [SerializeReference] protected List<TProcessor> processors = new();
 
         public Registry<TSetting> Settings => settings;
         public Registry<TContext> Contexts => contexts;
 
-        public IEnumerable<IProcessor<TSetting, TContext>> Processors
-        {
-            get
-            {
-                foreach (var p in processors)
-                    yield return (IProcessor<TSetting, TContext>)p;
-            }
-        }
+        public IReadOnlyList<TProcessor> Processors => processors;
 
         protected bool Initialized;
 
         #region Editor Code
 
 #if UNITY_EDITOR
+
+        public override object GetSetting() => settings;
+        public override object GetContext() => contexts;
+        public override object GetProcessor() => processors;
+
+        public override Type SettingType() => typeof(TSetting);
+        public override Type ContextType() => typeof(TContext);
+        public override Type ProcessorType() => typeof(TProcessor);
+
         private void OnValidate()
         {
             if (Application.isPlaying)
@@ -258,9 +270,12 @@ namespace AM.Core
 
         protected virtual void PerformInvoke()
         {
-            foreach (var processor in processors)
+            for (int i = 0; i < processors.Count; i++)
             {
+                TProcessor processor = processors[i];
+
                 if (processor == null) continue;
+
                 processor.Process();
             }
         }

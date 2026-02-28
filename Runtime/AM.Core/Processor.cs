@@ -15,8 +15,6 @@ namespace AM.Core
 
         void IProcessor.Initialize(object settingRegistry, object contextRegistry)
         {
-            Debug.Log("Initialized");
-
             Initialize((Registry<TSetting>)settingRegistry, (Registry<TContext>)contextRegistry);
         }
 

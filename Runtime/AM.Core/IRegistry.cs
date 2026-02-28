@@ -1,9 +1,7 @@
 ﻿namespace AM.Core
 {
-    public interface IRegistry<TTarget>
+    public interface IRegistry<TTarget> : IReadOnlyRegistry<TTarget>
     {
         void Register<T>(T context) where T : TTarget;
-        T Get<T>() where  T : TTarget;
-        bool TryGet<T>(out T context) where T : TTarget;
     }
 }
