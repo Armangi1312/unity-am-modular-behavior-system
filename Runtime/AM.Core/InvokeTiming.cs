@@ -41,7 +41,7 @@ namespace AM.Core
         /// <summary>
         /// 오브젝트가 파괴될 때 때(유니티 이벤트)
         /// </summary>
-        OnDestroyed = 1 << 6,
+        Destroy = 1 << 6,
 
         /// <summary>
         /// Processor을 호출하는 컴포넌트(Controller)가 활성화될 때

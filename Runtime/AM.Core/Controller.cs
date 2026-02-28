@@ -140,7 +140,7 @@ namespace AM.Core
             }
         }
 
-        private void ValidateRuntimeDependencies()
+        protected void ValidateRuntimeDependencies()
         {
             var requiredContexts = new HashSet<Type>();
             var requiredSettings = new HashSet<Type>();
