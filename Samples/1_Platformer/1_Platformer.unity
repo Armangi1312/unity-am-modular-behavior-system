@@ -119,437 +119,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &263956248
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 263956255}
-  - component: {fileID: 263956254}
-  - component: {fileID: 263956253}
-  - component: {fileID: 263956252}
-  - component: {fileID: 263956251}
-  - component: {fileID: 263956250}
-  - component: {fileID: 263956249}
-  m_Layer: 0
-  m_Name: Player (1)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &263956249
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 263956248}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7232c45f15af2cb40b9266d8cad913ef, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::AnimationController
-  settings:
-    rid: 6939208123043020875
-  contexts:
-    rid: 6939208123043020876
-  processors:
-  - rid: 6939208123043020877
-  - rid: 6939208123043020882
-  references:
-    version: 2
-    RefIds:
-    - rid: 6939208123043020875
-      type: {class: 'Registry`1[[IAnimationSetting, Assembly-CSharp]]', ns: AM.Core, asm: AM.Core}
-      data:
-        serializedObjects:
-        - rid: 6939208123043020878
-        - rid: 6939208123043020879
-        - rid: 6939208123043020880
-        - rid: 6939208123043020883
-    - rid: 6939208123043020876
-      type: {class: 'Registry`1[[IAnimationContext, Assembly-CSharp]]', ns: AM.Core, asm: AM.Core}
-      data:
-        serializedObjects:
-        - rid: 6939208123043020881
-        - rid: 6939208123043020884
-    - rid: 6939208123043020877
-      type: {class: MoveAnimationProcessor, ns: , asm: Assembly-CSharp}
-      data: 
-    - rid: 6939208123043020878
-      type: {class: MoveAnimationSetting, ns: , asm: Assembly-CSharp}
-      data:
-        <MoveParameter>k__BackingField:
-          <Name>k__BackingField: IsMoving
-          <Type>k__BackingField: 4
-        <SpriteRenderer>k__BackingField: {fileID: 263956254}
-    - rid: 6939208123043020879
-      type: {class: AnimatorSetting, ns: , asm: Assembly-CSharp}
-      data:
-        <Animator>k__BackingField: {fileID: 263956251}
-    - rid: 6939208123043020880
-      type: {class: MovementAnimationSetting, ns: , asm: Assembly-CSharp}
-      data:
-        <Controller>k__BackingField: {fileID: 263956250}
-    - rid: 6939208123043020881
-      type: {class: MoveAnimationContext, ns: , asm: Assembly-CSharp}
-      data:
-        <IsMoving>k__BackingField: 0
-    - rid: 6939208123043020882
-      type: {class: JumpAnimationProcessor, ns: , asm: Assembly-CSharp}
-      data: 
-    - rid: 6939208123043020883
-      type: {class: JumpAnimationSetting, ns: , asm: Assembly-CSharp}
-      data:
-        <JumpParameter>k__BackingField:
-          <Name>k__BackingField: IsJumped
-          <Type>k__BackingField: 4
-    - rid: 6939208123043020884
-      type: {class: JumpAnimationContext, ns: , asm: Assembly-CSharp}
-      data:
-        <IsJumped>k__BackingField: 0
---- !u!114 &263956250
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 263956248}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e3c2507257885443ba9d7a54231e8e3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MovementController
-  settings:
-    rid: 6939208123043020862
-  contexts:
-    rid: 6939208123043020863
-  processors:
-  - rid: 6939208123043020873
-  - rid: 6939208123043020885
-  - rid: 6939208123043020886
-  references:
-    version: 2
-    RefIds:
-    - rid: 6939208123043020862
-      type: {class: 'Registry`1[[IMovementSetting, Assembly-CSharp]]', ns: AM.Core, asm: AM.Core}
-      data:
-        serializedObjects:
-        - rid: 6939208123043020865
-        - rid: 6939208123043020866
-        - rid: 6939208123043020870
-        - rid: 6939208123043020874
-    - rid: 6939208123043020863
-      type: {class: 'Registry`1[[IMovementContext, Assembly-CSharp]]', ns: AM.Core, asm: AM.Core}
-      data:
-        serializedObjects:
-        - rid: 6939208123043020867
-        - rid: 6939208123043020868
-        - rid: 6939208123043020871
-    - rid: 6939208123043020865
-      type: {class: MoveSetting, ns: , asm: Assembly-CSharp}
-      data:
-        <MoveSpeedOnGround>k__BackingField: 5
-        <MoveSpeedOffGround>k__BackingField: 6
-        <AccelerationOnGround>k__BackingField: 60
-        <AccelerationOffGround>k__BackingField: 30
-        <DecelerationOnGround>k__BackingField: 30
-        <DecelerationOffGround>k__BackingField: 2
-    - rid: 6939208123043020866
-      type: {class: Rigidbody2DSetting, ns: , asm: Assembly-CSharp}
-      data:
-        <Rigidbody2D>k__BackingField: {fileID: 263956253}
-    - rid: 6939208123043020867
-      type: {class: MoveContext, ns: , asm: Assembly-CSharp}
-      data:
-        <Speed>k__BackingField: 5
-        <Acceleration>k__BackingField: 60
-        <Deceleration>k__BackingField: 30
-        <IsMoving>k__BackingField: 0
-        <MoveDirection>k__BackingField: 0
-        <LinearVelocityX>k__BackingField: 0
-    - rid: 6939208123043020868
-      type: {class: GroundContext, ns: , asm: Assembly-CSharp}
-      data:
-        <IsGrounded>k__BackingField: 1
-    - rid: 6939208123043020870
-      type: {class: JumpSetting, ns: , asm: Assembly-CSharp}
-      data:
-        <JumpPower>k__BackingField: 10
-        <JumpCutFactor>k__BackingField: 0.5
-    - rid: 6939208123043020871
-      type: {class: JumpContext, ns: , asm: Assembly-CSharp}
-      data:
-        <IsJumped>k__BackingField: 0
-        <IsJumpPressed>k__BackingField: 0
-    - rid: 6939208123043020873
-      type: {class: GroundCheckProcessor, ns: , asm: Assembly-CSharp}
-      data: 
-    - rid: 6939208123043020874
-      type: {class: GroundCheckSetting, ns: , asm: Assembly-CSharp}
-      data:
-        <GroundCheckCollider>k__BackingField: {fileID: 382597948}
-        <GroundLayerMask>k__BackingField:
-          serializedVersion: 2
-          m_Bits: 8
-    - rid: 6939208123043020885
-      type: {class: MoveProcessor, ns: , asm: Assembly-CSharp}
-      data: 
-    - rid: 6939208123043020886
-      type: {class: JumpProcessor, ns: , asm: Assembly-CSharp}
-      data: 
---- !u!95 &263956251
-Animator:
-  serializedVersion: 7
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 263956248}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 9d5fcb39490466f45b33dc8be435bdf3, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
---- !u!61 &263956252
-BoxCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 263956248}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ForceSendLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ForceReceiveLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ContactCaptureLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_CallbackLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_CompositeOperation: 0
-  m_CompositeOrder: 0
-  m_Offset: {x: 0, y: -0.065}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1, y: 1}
-    newSize: {x: 1, y: 1}
-    adaptiveTilingThreshold: 0.5
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  m_Size: {x: 0.7, y: 0.87}
-  m_EdgeRadius: 0
---- !u!50 &263956253
-Rigidbody2D:
-  serializedVersion: 5
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 263956248}
-  m_BodyType: 0
-  m_Simulated: 1
-  m_UseFullKinematicContacts: 0
-  m_UseAutoMass: 0
-  m_Mass: 1
-  m_LinearDamping: 0
-  m_AngularDamping: 0.05
-  m_GravityScale: 2
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_Interpolate: 1
-  m_SleepingMode: 1
-  m_CollisionDetection: 0
-  m_Constraints: 4
---- !u!212 &263956254
-SpriteRenderer:
-  serializedVersion: 2
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 263956248}
-  m_Enabled: 1
-  m_CastShadows: 0
-  m_ReceiveShadows: 0
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 0
-  m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 0
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 5
-  m_MaskInteraction: 0
-  m_Sprite: {fileID: -1598815730, guid: c9b1240a4bb65b64ebfb6faf113f2f05, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_FlipX: 0
-  m_FlipY: 0
-  m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
-  m_AdaptiveModeThreshold: 0.5
-  m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
-  m_SpriteSortPoint: 0
---- !u!4 &263956255
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 263956248}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 382597949}
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &382597947
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 382597949}
-  - component: {fileID: 382597948}
-  m_Layer: 0
-  m_Name: GroundCheck
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!61 &382597948
-BoxCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 382597947}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ForceSendLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ForceReceiveLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ContactCaptureLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_CallbackLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_IsTrigger: 1
-  m_UsedByEffector: 0
-  m_CompositeOperation: 0
-  m_CompositeOrder: 0
-  m_Offset: {x: 0, y: -0.456}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1, y: 1}
-    newSize: {x: 1, y: 1}
-    adaptiveTilingThreshold: 0.5
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  m_Size: {x: 0.6, y: 0.1}
-  m_EdgeRadius: 0
---- !u!4 &382597949
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 382597947}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 263956255}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &645431376
 GameObject:
   m_ObjectHideFlags: 0
@@ -990,7 +559,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!212 &723187316
 SpriteRenderer:
   serializedVersion: 2
@@ -1174,78 +743,78 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MovementController
   settings:
-    rid: 6939208123043020862
+    rid: 6939208174569259012
   contexts:
-    rid: 6939208123043020863
+    rid: 6939208174569259013
   processors:
-  - rid: 6939208123043020864
-  - rid: 6939208123043020869
-  - rid: 6939208123043020873
+  - rid: 6939208174569259016
+  - rid: 6939208174569259021
+  - rid: 6939208174569259024
   references:
     version: 2
     RefIds:
-    - rid: 6939208123043020862
-      type: {class: 'Registry`1[[IMovementSetting, Assembly-CSharp]]', ns: AM.Core, asm: AM.Core}
+    - rid: 6939208174569259012
+      type: {class: 'Registry`1[[IMovementSetting, Platformer_Sample]]', ns: AM.Core, asm: AM.Core}
       data:
         serializedObjects:
-        - rid: 6939208123043020865
-        - rid: 6939208123043020866
-        - rid: 6939208123043020870
-        - rid: 6939208123043020874
-    - rid: 6939208123043020863
-      type: {class: 'Registry`1[[IMovementContext, Assembly-CSharp]]', ns: AM.Core, asm: AM.Core}
+        - rid: 6939208174569259017
+        - rid: 6939208174569259018
+        - rid: 6939208174569259022
+        - rid: 6939208174569259025
+    - rid: 6939208174569259013
+      type: {class: 'Registry`1[[IMovementContext, Platformer_Sample]]', ns: AM.Core, asm: AM.Core}
       data:
         serializedObjects:
-        - rid: 6939208123043020867
-        - rid: 6939208123043020868
-        - rid: 6939208123043020871
-    - rid: 6939208123043020864
-      type: {class: MoveProcessor, ns: , asm: Assembly-CSharp}
+        - rid: 6939208174569259019
+        - rid: 6939208174569259020
+        - rid: 6939208174569259023
+    - rid: 6939208174569259016
+      type: {class: MoveProcessor, ns: , asm: Platformer_Sample}
       data: 
-    - rid: 6939208123043020865
-      type: {class: MoveSetting, ns: , asm: Assembly-CSharp}
+    - rid: 6939208174569259017
+      type: {class: MoveSetting, ns: , asm: Platformer_Sample}
       data:
         <MoveSpeedOnGround>k__BackingField: 5
         <MoveSpeedOffGround>k__BackingField: 6
-        <AccelerationOnGround>k__BackingField: 60
-        <AccelerationOffGround>k__BackingField: 30
-        <DecelerationOnGround>k__BackingField: 30
-        <DecelerationOffGround>k__BackingField: 2
-    - rid: 6939208123043020866
-      type: {class: Rigidbody2DSetting, ns: , asm: Assembly-CSharp}
+        <AccelerationOnGround>k__BackingField: 30
+        <AccelerationOffGround>k__BackingField: 5
+        <DecelerationOnGround>k__BackingField: 50
+        <DecelerationOffGround>k__BackingField: 5
+    - rid: 6939208174569259018
+      type: {class: Rigidbody2DSetting, ns: , asm: Platformer_Sample}
       data:
         <Rigidbody2D>k__BackingField: {fileID: 723187319}
-    - rid: 6939208123043020867
-      type: {class: MoveContext, ns: , asm: Assembly-CSharp}
+    - rid: 6939208174569259019
+      type: {class: MoveContext, ns: , asm: Platformer_Sample}
       data:
-        <Speed>k__BackingField: 5
-        <Acceleration>k__BackingField: 60
-        <Deceleration>k__BackingField: 30
+        <Speed>k__BackingField: 0
+        <Acceleration>k__BackingField: 0
+        <Deceleration>k__BackingField: 0
         <IsMoving>k__BackingField: 0
         <MoveDirection>k__BackingField: 0
         <LinearVelocityX>k__BackingField: 0
-    - rid: 6939208123043020868
-      type: {class: GroundContext, ns: , asm: Assembly-CSharp}
+    - rid: 6939208174569259020
+      type: {class: GroundContext, ns: , asm: Platformer_Sample}
       data:
-        <IsGrounded>k__BackingField: 1
-    - rid: 6939208123043020869
-      type: {class: JumpProcessor, ns: , asm: Assembly-CSharp}
+        <IsGrounded>k__BackingField: 0
+    - rid: 6939208174569259021
+      type: {class: JumpProcessor, ns: , asm: Platformer_Sample}
       data: 
-    - rid: 6939208123043020870
-      type: {class: JumpSetting, ns: , asm: Assembly-CSharp}
+    - rid: 6939208174569259022
+      type: {class: JumpSetting, ns: , asm: Platformer_Sample}
       data:
         <JumpPower>k__BackingField: 10
         <JumpCutFactor>k__BackingField: 0.5
-    - rid: 6939208123043020871
-      type: {class: JumpContext, ns: , asm: Assembly-CSharp}
+    - rid: 6939208174569259023
+      type: {class: JumpContext, ns: , asm: Platformer_Sample}
       data:
         <IsJumped>k__BackingField: 0
         <IsJumpPressed>k__BackingField: 0
-    - rid: 6939208123043020873
-      type: {class: GroundCheckProcessor, ns: , asm: Assembly-CSharp}
+    - rid: 6939208174569259024
+      type: {class: GroundCheckProcessor, ns: , asm: Platformer_Sample}
       data: 
-    - rid: 6939208123043020874
-      type: {class: GroundCheckSetting, ns: , asm: Assembly-CSharp}
+    - rid: 6939208174569259025
+      type: {class: GroundCheckSetting, ns: , asm: Platformer_Sample}
       data:
         <GroundCheckCollider>k__BackingField: {fileID: 1906752035}
         <GroundLayerMask>k__BackingField:
@@ -1264,64 +833,64 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AnimationController
   settings:
-    rid: 6939208123043020875
+    rid: 6939208174569259014
   contexts:
-    rid: 6939208123043020876
+    rid: 6939208174569259015
   processors:
-  - rid: 6939208123043020877
-  - rid: 6939208123043020882
+  - rid: 6939208174569259088
+  - rid: 6939208174569259093
   references:
     version: 2
     RefIds:
-    - rid: 6939208123043020875
-      type: {class: 'Registry`1[[IAnimationSetting, Assembly-CSharp]]', ns: AM.Core, asm: AM.Core}
+    - rid: 6939208174569259014
+      type: {class: 'Registry`1[[IAnimationSetting, Platformer_Sample]]', ns: AM.Core, asm: AM.Core}
       data:
         serializedObjects:
-        - rid: 6939208123043020878
-        - rid: 6939208123043020879
-        - rid: 6939208123043020880
-        - rid: 6939208123043020883
-    - rid: 6939208123043020876
-      type: {class: 'Registry`1[[IAnimationContext, Assembly-CSharp]]', ns: AM.Core, asm: AM.Core}
+        - rid: 6939208174569259089
+        - rid: 6939208174569259090
+        - rid: 6939208174569259091
+        - rid: 6939208174569259094
+    - rid: 6939208174569259015
+      type: {class: 'Registry`1[[IAnimationContext, Platformer_Sample]]', ns: AM.Core, asm: AM.Core}
       data:
         serializedObjects:
-        - rid: 6939208123043020881
-        - rid: 6939208123043020884
-    - rid: 6939208123043020877
-      type: {class: MoveAnimationProcessor, ns: , asm: Assembly-CSharp}
+        - rid: 6939208174569259092
+        - rid: 6939208174569259095
+    - rid: 6939208174569259088
+      type: {class: JumpAnimationProcessor, ns: , asm: Platformer_Sample}
       data: 
-    - rid: 6939208123043020878
-      type: {class: MoveAnimationSetting, ns: , asm: Assembly-CSharp}
+    - rid: 6939208174569259089
+      type: {class: JumpAnimationSetting, ns: , asm: Platformer_Sample}
+      data:
+        <JumpParameter>k__BackingField:
+          <Name>k__BackingField: IsJumped
+          <Type>k__BackingField: 4
+    - rid: 6939208174569259090
+      type: {class: AnimatorSetting, ns: , asm: Platformer_Sample}
+      data:
+        <Animator>k__BackingField: {fileID: 723187320}
+    - rid: 6939208174569259091
+      type: {class: MovementAnimationSetting, ns: , asm: Platformer_Sample}
+      data:
+        <Controller>k__BackingField: {fileID: 723187321}
+    - rid: 6939208174569259092
+      type: {class: JumpAnimationContext, ns: , asm: Platformer_Sample}
+      data:
+        <IsJumped>k__BackingField: 0
+    - rid: 6939208174569259093
+      type: {class: MoveAnimationProcessor, ns: , asm: Platformer_Sample}
+      data: 
+    - rid: 6939208174569259094
+      type: {class: MoveAnimationSetting, ns: , asm: Platformer_Sample}
       data:
         <MoveParameter>k__BackingField:
           <Name>k__BackingField: IsMoving
           <Type>k__BackingField: 4
         <SpriteRenderer>k__BackingField: {fileID: 723187316}
-    - rid: 6939208123043020879
-      type: {class: AnimatorSetting, ns: , asm: Assembly-CSharp}
-      data:
-        <Animator>k__BackingField: {fileID: 723187320}
-    - rid: 6939208123043020880
-      type: {class: MovementAnimationSetting, ns: , asm: Assembly-CSharp}
-      data:
-        <Controller>k__BackingField: {fileID: 723187321}
-    - rid: 6939208123043020881
-      type: {class: MoveAnimationContext, ns: , asm: Assembly-CSharp}
+    - rid: 6939208174569259095
+      type: {class: MoveAnimationContext, ns: , asm: Platformer_Sample}
       data:
         <IsMoving>k__BackingField: 0
-    - rid: 6939208123043020882
-      type: {class: JumpAnimationProcessor, ns: , asm: Assembly-CSharp}
-      data: 
-    - rid: 6939208123043020883
-      type: {class: JumpAnimationSetting, ns: , asm: Assembly-CSharp}
-      data:
-        <JumpParameter>k__BackingField:
-          <Name>k__BackingField: IsJumped
-          <Type>k__BackingField: 4
-    - rid: 6939208123043020884
-      type: {class: JumpAnimationContext, ns: , asm: Assembly-CSharp}
-      data:
-        <IsJumped>k__BackingField: 0
 --- !u!1 &750191335
 GameObject:
   m_ObjectHideFlags: 0
@@ -1351,7 +920,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2868d59ca8dc7a84796559c3e2744dae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FollowCamera
-  Target: {fileID: 263956255}
+  Target: {fileID: 723187317}
   Speed: 3
 --- !u!4 &750191337
 Transform:
@@ -25488,5 +25057,4 @@ SceneRoots:
   m_Roots:
   - {fileID: 750191337}
   - {fileID: 723187317}
-  - {fileID: 263956255}
   - {fileID: 2068869676}
