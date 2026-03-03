@@ -28,4 +28,17 @@
 
 	`https://github.com/Armangi1312/unity-am-modular-behavior-system.git`를 입력하여 패키지를 설치합니다.
 
-2. 
+2. 행동 구성: 유니티 인스펙터에서 Setting, Processor, Context를 설정하여 원하는 행동을 구성합니다.
+
+	![컨트롤러 이미지](./Documentation~/스크린샷 2026-03-03 175441.png)
+ 
+    '+' 버튼을 눌러서 프로세서를 추가할 수 있습니다. 
+    '-' 버튼을 눌러서 프로세서를 제거할 수 있습니다. 
+	 *단, 런타임에는 수정할 수 없습니다.*
+	
+	Setting과 Context도 Processor를 추가하는 방법과 같게 추가할 수 있습니다.
+	
+	필요한 경우, 프로세서의 순서를 변경하여 행동의 우선순위를 조정할 수 있습니다.
+	요구되는 Context, Setting을 자동으로 추가합니다.
+
+	자세한 코드 내용 및, 예제는 [Documentation](./Documentation~) 폴더를 참조하세요.
