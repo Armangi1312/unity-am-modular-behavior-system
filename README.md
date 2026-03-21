@@ -54,15 +54,11 @@ https://github.com/Armangi1312/unity-am-modular-behavior-system.git
 
 Select "**Add package from Git URL**" in the Package Manager and enter the URL above.
 
-<img src="https://raw.githubusercontent.com/Armangi1312/unity-am-modular-behavior-system/main/Images/SC2.png" width="600" alt="Package Installation"/>
-
 ---
 
 ### 3.2 Behavior Configuration
 
 Add Setting, Processor, and Context in the Inspector to configure behaviors.
-
-<img src="https://raw.githubusercontent.com/Armangi1312/unity-am-modular-behavior-system/main/Images/SC1.png" width="600" alt="Controller"/>
 
 #### Processor Management
 

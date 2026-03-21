@@ -36,7 +36,6 @@ This structure clearly separates data from execution flow, maximizing maintainab
 
 Install the package via Git URL through the Unity Package Manager.
 
-![Package Installation](./Documentation~/스크린샷%202026-03-03%20174631.png)
 ```
 https://github.com/Armangi1312/unity-am-modular-behavior-system.git
 ```
@@ -195,7 +194,7 @@ In short, the Controller acts as the orchestrator of the execution pipeline.
 
 The Controller is used by inheriting from it as follows:
 ```csharp
-public class YourName : Controller<IRequiredSetting, IRequiredContext>
+public class Name : Controller<IRequiredSetting, IRequiredContext>
 {
 }
 ```
