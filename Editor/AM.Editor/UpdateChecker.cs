@@ -40,11 +40,9 @@ namespace AM.Editor
 
             try
             {
-                // Read local version.json
                 string localJson = System.IO.File.ReadAllText(LocalVersionPath);
                 var localInfo = JsonUtility.FromJson<VersionInfo>(localJson);
 
-                // Read remote version.json
                 using var client = new HttpClient();
                 string remoteJson = await client.GetStringAsync(RemoteVersionUrl);
                 var remoteInfo = JsonUtility.FromJson<VersionInfo>(remoteJson);
