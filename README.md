@@ -24,6 +24,8 @@
 
 ### 유니티 인스펙터 지원
 
+
+
 - 인스펙터에서 Setting, Processor, Context를 쉽게 구성할 수 있습니다.
 - 디자이너와 개발자가 협업하여 행동을 직관적으로 조정할 수 있습니다.
 
@@ -53,9 +55,9 @@
 https://github.com/Armangi1312/unity-am-modular-behavior-system.git
 ```
 
-패키지 매니저에서 **"Add package from Git URL"**을 선택 후 위 주소를 입력하세요.
+패키지 매니저에서 "**Add package from Git URL**"을 선택 후 위 주소를 입력하세요.
 
-![패키지 설치 이미지](./Documentation~/스크린샷%202026-03-03%20174631.png)
+![패키지 설치 이미지](https://raw.githubusercontent.com/Armangi1312/unity-am-modular-behavior-system/main/Documentation~/Images/SC2.png)
 
 ---
 
@@ -63,7 +65,7 @@ https://github.com/Armangi1312/unity-am-modular-behavior-system.git
 
 인스펙터에서 Setting, Processor, Context를 추가하여 행동을 구성합니다.
 
-![컨트롤러 이미지](./Documentation~/스크린샷%202026-03-03%20175441.png)
+![컨트롤러 이미지](https://raw.githubusercontent.com/Armangi1312/unity-am-modular-behavior-system/main/Documentation~/Images/SC1.png)
 
 #### Processor 관리
 
