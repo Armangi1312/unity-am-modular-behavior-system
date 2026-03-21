@@ -18,8 +18,25 @@
     "controller"
   ],
   "author": {
-    "name": "Ghoonykim",
+    "name": "Armang_1312",
     "email": "ghoonykim@gmail.com",
     "url": "https://github.com/Armangi1312/"
-  }
+  },
+  "samples": [
+    {
+      "displayName": "Swing Object",
+      "description": "Swinging object example.",
+      "path": "Samples~/0_SwingObject"
+    },
+    {
+      "displayName": "2D Platformer",
+      "description": "2D platformer character controller example.",
+      "path": "Samples~/1_Platformer"
+    },
+    {
+      "displayName": "3D Movement",
+      "description": "3D character movement controller example.",
+      "path": "Samples~/2_FPSMovement"
+    }
+  ]
 }
