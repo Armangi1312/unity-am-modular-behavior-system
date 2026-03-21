@@ -65,7 +65,7 @@ https://github.com/Armangi1312/unity-am-modular-behavior-system.git
 
 인스펙터에서 Setting, Processor, Context를 추가하여 행동을 구성합니다.
 
-<img src="https://raw.githubusercontent.com/Armangi1312/unity-am-modular-behavior-system/main/Documentation~/Images/SC1.png" width="600" alt="컨트롤러 이미지"/>
+<img src="https://raw.githubusercontent.com/Armangi1312/unity-am-modular-behavior-system/main/Documentation%7E/Images/SC1.png" width="600" alt="컨트롤러 이미지"/>
 
 #### Processor 관리
 
