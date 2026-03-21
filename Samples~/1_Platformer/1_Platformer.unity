@@ -178,7 +178,7 @@ TilemapRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
+  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -469,13 +469,16 @@ Tilemap:
       m_AllTileFlags: 2
   m_AnimatedTiles: {}
   m_TileAssetArray:
-  - m_RefCount: 25
+  - serializedVersion: 2
+    m_RefCount: 25
     m_Data: {fileID: 11400000, guid: 237824e5dcb08a242b98b6fb2c760a37, type: 2}
   m_TileSpriteArray:
-  - m_RefCount: 25
+  - serializedVersion: 2
+    m_RefCount: 25
     m_Data: {fileID: 21300000, guid: b945990fb8295d045b1c7cd2359f40c3, type: 3}
   m_TileMatrixArray:
-  - m_RefCount: 7
+  - serializedVersion: 2
+    m_RefCount: 7
     m_Data:
       e00: -1
       e01: 0
@@ -493,7 +496,8 @@ Tilemap:
       e31: 0
       e32: 0
       e33: 1
-  - m_RefCount: 18
+  - serializedVersion: 2
+    m_RefCount: 18
     m_Data:
       e00: 1
       e01: 0
@@ -512,7 +516,8 @@ Tilemap:
       e32: 0
       e33: 1
   m_TileColorArray:
-  - m_RefCount: 25
+  - serializedVersion: 2
+    m_RefCount: 25
     m_Data: {r: 1, g: 1, b: 1, a: 1}
   m_TileObjectToInstantiateArray: []
   m_AnimationFrameRate: 1
@@ -586,7 +591,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
+  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -964,7 +969,7 @@ Light:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 811016842}
   m_Enabled: 1
-  serializedVersion: 12
+  serializedVersion: 13
   m_Type: 1
   m_Color: {r: 1, g: 0.95686275, b: 0.8392157, a: 1}
   m_Intensity: 1
@@ -1016,7 +1021,7 @@ Light:
   m_UseBoundingSphereOverride: 0
   m_UseViewFrustumForShadowCasterCull: 1
   m_ForceVisible: 0
-  m_ShadowRadius: 0
+  m_ShapeRadius: 0
   m_ShadowAngle: 0
   m_LightUnit: 1
   m_LuxAtDistance: 1
@@ -1125,7 +1130,7 @@ TilemapRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
+  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -24696,17 +24701,22 @@ Tilemap:
       m_AllTileFlags: 1073741825
   m_AnimatedTiles: {}
   m_TileAssetArray:
-  - m_RefCount: 2217
+  - serializedVersion: 2
+    m_RefCount: 2217
     m_Data: {fileID: 11400000, guid: f7c7a87dd48a9664280c641431cf3254, type: 2}
-  - m_RefCount: 136
+  - serializedVersion: 2
+    m_RefCount: 136
     m_Data: {fileID: 11400000, guid: 5572082042a68a240adb67abfde18b37, type: 2}
   m_TileSpriteArray:
-  - m_RefCount: 2217
+  - serializedVersion: 2
+    m_RefCount: 2217
     m_Data: {fileID: 21300000, guid: 7f340b4cdcdfed046a0d0c22192b259c, type: 3}
-  - m_RefCount: 136
+  - serializedVersion: 2
+    m_RefCount: 136
     m_Data: {fileID: 21300000, guid: 9882d5836cf6efd44b6339a450310e4e, type: 3}
   m_TileMatrixArray:
-  - m_RefCount: 2353
+  - serializedVersion: 2
+    m_RefCount: 2353
     m_Data:
       e00: 1
       e01: 0
@@ -24725,7 +24735,8 @@ Tilemap:
       e32: 0
       e33: 1
   m_TileColorArray:
-  - m_RefCount: 2353
+  - serializedVersion: 2
+    m_RefCount: 2353
     m_Data: {r: 1, g: 1, b: 1, a: 1}
   m_TileObjectToInstantiateArray: []
   m_AnimationFrameRate: 1
