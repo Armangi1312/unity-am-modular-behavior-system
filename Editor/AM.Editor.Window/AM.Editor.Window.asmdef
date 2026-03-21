@@ -1,0 +1,19 @@
+{
+    "name": "AM.Editor.Window",
+    "rootNamespace": "",
+    "references": [
+        "GUID:fafeef20e3931f345975669a2f9f7ca1",
+        "GUID:0cff0ccd3ebf03940b46f7c77446d9ba"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

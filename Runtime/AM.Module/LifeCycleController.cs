@@ -2,10 +2,10 @@ using AM.Core;
 
 namespace AM.Module
 {
-    public class LifeCycleController<TSetting, TContext, TProcessor> : Controller<TSetting, TContext, TProcessor>
+    public class LifeCycleController<TSetting, TContext, TProcessor> : SingleController<TSetting, TContext, TProcessor>
         where TSetting : class, ISetting
         where TContext : class, IContext
-        where TProcessor : class, IProcessor, ILifeCycleProcessor
+        where TProcessor : class, IProcessor<TSetting, TContext>, ILifeCycleProcessor
     {
         protected bool HasUpdateProcessors;
         protected bool HasFixedUpdateProcessors;
@@ -72,10 +72,5 @@ namespace AM.Module
             if (HasLateUpdateProcessors)
                 PerformInvoke(InvokeTiming.LateUpdate);
         }
-    }
-
-    public sealed class LifeCycleController : LifeCycleController<ISetting, IContext, ILifeCycleProcessor>
-    {
-        
     }
 }

@@ -2,8 +2,7 @@
     "name": "AM.Editor",
     "rootNamespace": "",
     "references": [
-        "GUID:fafeef20e3931f345975669a2f9f7ca1",
-        "GUID:fdec262578e6bab4cbdae7c7e15b2cfa"
+        "GUID:fafeef20e3931f345975669a2f9f7ca1"
     ],
     "includePlatforms": [
         "Editor"

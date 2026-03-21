@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace AM.Core
+﻿namespace AM.Core
 {
     public interface IReadOnlyRegistry<TTarget>
     {

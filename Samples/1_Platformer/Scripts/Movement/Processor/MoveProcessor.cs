@@ -1,4 +1,5 @@
 ﻿using AM.Core;
+using AM.Core.Utilities;
 using System;
 using UnityEngine;
 
@@ -17,7 +18,7 @@ public class MoveProcessor : MovementProcessor
     private MoveContext context;
     private GroundContext groundContext;
 
-    public override void Initialize(Registry<IMovementSetting> settingRegistry, Registry<IMovementContext> contextRegistry)
+    public override void Initialize(IReadOnlyRegistry<IMovementSetting> settingRegistry, IReadOnlyRegistry<IMovementContext> contextRegistry)
     {
         setting = settingRegistry.Get<MoveSetting>();
         rigidBody2DSetting = settingRegistry.Get<Rigidbody2DSetting>();

@@ -1,6 +1,6 @@
 ﻿using AM.Core;
+using AM.Core.Utilities;
 using System;
-using UnityEngine;
 
 [Serializable]
 [RequireSetting(typeof(JumpAnimationSetting))]
@@ -20,8 +20,8 @@ public class JumpAnimationProcessor : AnimationProcessor
     private GroundContext groundContext;
 
     public override void Initialize(
-        Registry<IAnimationSetting> settingRegistry,
-        Registry<IAnimationContext> contextRegistry)
+        IReadOnlyRegistry<IAnimationSetting> settingRegistry,
+        IReadOnlyRegistry<IAnimationContext> contextRegistry)
     {
         jumpAnimationSetting = settingRegistry.Get<JumpAnimationSetting>();
         animatorSetting = settingRegistry.Get<AnimatorSetting>();

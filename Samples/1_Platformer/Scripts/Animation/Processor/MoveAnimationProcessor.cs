@@ -1,4 +1,5 @@
 ﻿using AM.Core;
+using AM.Core.Utilities;
 using System;
 using UnityEngine;
 
@@ -19,8 +20,8 @@ public class MoveAnimationProcessor : AnimationProcessor
     private MoveContext moveContext;
 
     public override void Initialize(
-        Registry<IAnimationSetting> settingRegistry,
-        Registry<IAnimationContext> contextRegistry)
+        IReadOnlyRegistry<IAnimationSetting> settingRegistry,
+        IReadOnlyRegistry<IAnimationContext> contextRegistry)
     {
         moveAnimationSetting = settingRegistry.Get<MoveAnimationSetting>();
         animatorSetting = settingRegistry.Get<AnimatorSetting>();

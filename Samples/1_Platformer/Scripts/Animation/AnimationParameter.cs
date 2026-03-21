@@ -16,7 +16,7 @@ public class AnimationParameter : ISerializationCallbackReceiver
     }
     public void OnBeforeSerialize()
     {
-        
+
     }
     public void OnAfterDeserialize()
     {

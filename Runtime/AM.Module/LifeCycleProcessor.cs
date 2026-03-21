@@ -1,8 +1,10 @@
 ﻿using AM.Core;
+using System;
 
 namespace AM.Module
 {
-    public abstract class LifeCycleProcessor<TSetting, TContext> : Processor<TSetting, TContext>, ILifeCycleProcessor<TSetting, TContext>
+    [Serializable]
+    public abstract class LifeCycleProcessor<TSetting, TContext> : SingleProcessor<TSetting, TContext>, ILifeCycleProcessor<TSetting, TContext>
         where TSetting : ISetting
         where TContext : IContext
     {

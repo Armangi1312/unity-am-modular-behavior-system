@@ -1,4 +1,5 @@
 ﻿using AM.Core;
+using AM.Core.Utilities;
 using System;
 using UnityEngine;
 
@@ -15,7 +16,7 @@ public class GroundCheckProcessor : MovementProcessor
     private GroundCheckSetting setting;
     private GroundContext context;
 
-    public override void Initialize(Registry<IMovementSetting> settingRegistry, Registry<IMovementContext> contextRegistry)
+    public override void Initialize(IReadOnlyRegistry<IMovementSetting> settingRegistry, IReadOnlyRegistry<IMovementContext> contextRegistry)
     {
         setting = settingRegistry.Get<GroundCheckSetting>();
         context = contextRegistry.Get<GroundContext>();
