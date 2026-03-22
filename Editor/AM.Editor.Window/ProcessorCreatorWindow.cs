@@ -15,7 +15,7 @@ namespace AM.Editor
         private string className = "NewProcessor";
 
         private string namespaceName = "";
-        private List<Type> allProcessorBaseTypes = new();
+        private readonly List<Type> allProcessorBaseTypes = new();
         private string[] processorBaseTypeNames = Array.Empty<string>();
         private int selectedProcessorIndex = -1;
         private int prevProcessorIndex = -2;
@@ -23,8 +23,8 @@ namespace AM.Editor
         private Type constraintSettingInterface = null;
         private Type constraintContextInterface = null;
 
-        private List<Type> filteredSettingTypes = new();
-        private List<Type> filteredContextTypes = new();
+        private readonly List<Type> filteredSettingTypes = new();
+        private readonly List<Type> filteredContextTypes = new();
         private bool[] settingSelected = Array.Empty<bool>();
         private bool[] contextSelected = Array.Empty<bool>();
 
@@ -277,7 +277,7 @@ namespace AM.Editor
             if (allProcessorBaseTypes.Count == 0)
             {
                 EditorGUILayout.HelpBox(
-                    "ProcessorCache에서 IProcessor<,> 구현 타입을 찾지 못했습니다.",
+                    "There is not IProcessor<,>.",
                     MessageType.Warning);
                 return;
             }
@@ -488,7 +488,7 @@ namespace AM.Editor
 
             var name = t.GetGenericTypeDefinition().Name;
             int backtick = name.IndexOf('`');
-            if (backtick > 0) name = name.Substring(0, backtick);
+            if (backtick > 0) name = name[..backtick];
 
             var args = t.GetGenericArguments().Select(GetFriendlyTypeName);
             return $"{name}<{string.Join(", ", args)}>";
@@ -496,7 +496,7 @@ namespace AM.Editor
         private string ToCamelCase(string name)
         {
             if (string.IsNullOrEmpty(name)) return name;
-            return char.ToLower(name[0]) + name.Substring(1);
+            return char.ToLower(name[0]) + name[1..];
         }
 
         private void GenerateFile()
@@ -515,7 +515,7 @@ namespace AM.Editor
             File.WriteAllText(path, code, Encoding.UTF8);
             AssetDatabase.Refresh();
 
-            var relativePath = "Assets" + path.Substring(Application.dataPath.Length);
+            var relativePath = "Assets" + path[Application.dataPath.Length..];
             var asset = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(relativePath);
             if (asset != null)
             {

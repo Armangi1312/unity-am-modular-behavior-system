@@ -22,6 +22,8 @@ The system consists of three core components:
 
 ## 2. Key Features
 
+![SC1](https://raw.githubusercontent.com/Armangi1312/unity-am-modular-behavior-system/main/Images/SC1.png)
+
 ### Unity Inspector Support
 
 - Setting, Processor, and Context can be easily configured in the Inspector.
@@ -46,6 +48,8 @@ The system consists of three core components:
 ## 3. How to Use
 
 ### 3.1 Package Installation
+
+![SC2](https://raw.githubusercontent.com/Armangi1312/unity-am-modular-behavior-system/main/Images/SC2.png)
 
 Install via Git URL in the Unity Package Manager.
 ```

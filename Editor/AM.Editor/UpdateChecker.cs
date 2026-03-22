@@ -20,8 +20,6 @@ namespace AM.Editor
         private static RemoveRequest removeRequest;
         private static AddRequest addRequest;
 
-        private static bool UpdateChecked;
-
         [Serializable]
         private class PackageInfo
         {
@@ -30,10 +28,7 @@ namespace AM.Editor
 
         static UpdateChecker()
         {
-            if (UpdateChecked) return;
-
             EditorApplication.delayCall += OnEditorReady;
-            UpdateChecked = true;
         }
 
         private static async void OnEditorReady()
