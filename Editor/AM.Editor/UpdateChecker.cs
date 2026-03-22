@@ -13,25 +13,27 @@ namespace AM.Editor
         private const string PackageName = "com.ghoonykim.am.modular-behavior-system";
         private const string GitUrl = "https://github.com/Armangi1312/unity-am-modular-behavior-system.git";
 
-        private const string RemoteVersionUrl =
-            "https://raw.githubusercontent.com/Armangi1312/unity-am-modular-behavior-system/main/version.json";
+        private const string RemotePackageUrl = "https://raw.githubusercontent.com/Armangi1312/unity-am-modular-behavior-system/main/package.json";
 
-        private const string LocalVersionPath =
-            "Packages/com.ghoonykim.am.modular-behavior-system/version.json";
+        private const string LocalPackagePath = "Packages/com.ghoonykim.am.modular-behavior-system/package.json";
 
         private static RemoveRequest removeRequest;
         private static AddRequest addRequest;
 
+        private static bool UpdateChecked;
+
         [Serializable]
-        private class VersionInfo
+        private class PackageInfo
         {
             public string version;
-            public string updateImportance;
         }
 
         static UpdateChecker()
         {
+            if (UpdateChecked) return;
+
             EditorApplication.delayCall += OnEditorReady;
+            UpdateChecked = true;
         }
 
         private static async void OnEditorReady()
@@ -40,17 +42,15 @@ namespace AM.Editor
 
             try
             {
-                string localJson = System.IO.File.ReadAllText(LocalVersionPath);
-                var localInfo = JsonUtility.FromJson<VersionInfo>(localJson);
+                string localJson = System.IO.File.ReadAllText(LocalPackagePath);
+                var localInfo = JsonUtility.FromJson<PackageInfo>(localJson);
 
                 using var client = new HttpClient();
-                string remoteJson = await client.GetStringAsync(RemoteVersionUrl);
-                var remoteInfo = JsonUtility.FromJson<VersionInfo>(remoteJson);
+                string remoteJson = await client.GetStringAsync(RemotePackageUrl);
+                var remoteInfo = JsonUtility.FromJson<PackageInfo>(remoteJson);
 
                 if (IsNewVersionAvailable(localInfo.version, remoteInfo.version))
-                    ShowUpdateDialog(localInfo.version, remoteInfo.version, remoteInfo.updateImportance);
-                else
-                    Debug.Log("[UpdateChecker] Already up to date.");
+                    ShowUpdateDialog(localInfo.version, remoteInfo.version);
             }
             catch (Exception e)
             {
@@ -65,21 +65,13 @@ namespace AM.Editor
             return latestVer > currentVer;
         }
 
-        private static void ShowUpdateDialog(string current, string latest, string importance)
+        private static void ShowUpdateDialog(string current, string latest)
         {
-            string importanceLabel = importance switch
-            {
-                "hotfix" => "Hotfix",
-                "major" => "Major Update",
-                "minor" => "Minor Update",
-                _ => importance
-            };
-
             bool update = EditorUtility.DisplayDialog(
                 "Update Available",
-                $"[{importanceLabel}]\n\nA new version is available!\n\nCurrent: {current}\nLatest: {latest}\n\nWould you like to update now?",
-                "Update",
-                "Later"
+                $"A new version is available. \n\nCurrent: {current}\nLatest: {latest}\n\nWould you like to update now?",
+                "Yes",
+                "No"
             );
 
             if (update)
