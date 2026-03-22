@@ -66,6 +66,8 @@ Add Setting, Processor, and Context in the Inspector to configure behaviors.
 
 #### Processor Management
 
+![SC3](https://raw.githubusercontent.com/Armangi1312/unity-am-modular-behavior-system/main/Images/SC3.png)
+
 - `+` button: Add a Processor
 - `-` button: Remove a Processor
 - Drag to reorder (adjust priority)
