@@ -18,6 +18,8 @@ namespace AM.Editor
         private static RemoveRequest removeRequest;
         private static AddRequest addRequest;
 
+        private const string SessionKey = "AM.UpdateChecker.Checked";
+
         [Serializable]
         private class PackageInfo
         {
@@ -26,6 +28,9 @@ namespace AM.Editor
 
         static UpdateChecker()
         {
+            if (SessionState.GetBool(SessionKey, false)) return;
+            SessionState.SetBool(SessionKey, true);
+
             EditorApplication.delayCall += OnEditorReady;
         }
 
