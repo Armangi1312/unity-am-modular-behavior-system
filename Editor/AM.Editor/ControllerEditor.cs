@@ -24,10 +24,9 @@ namespace AM.Editor
         private void OnEnable()
         {
             controller = target as Controller;
-            if (controller == null)
-                return;
+            if (controller == null) return;
 
-            ResolveControllerTypesFromControllerAPIs();
+            ResolveControllerTypes();
 
             processorsProperty = serializedObject.FindProperty("processors");
             settingsRootProperty = serializedObject.FindProperty("settings");
@@ -37,100 +36,88 @@ namespace AM.Editor
                 processorList = CreateProcessorList();
         }
 
-        private void ResolveControllerTypesFromControllerAPIs()
+        private void ResolveControllerTypes()
         {
-            controllerSettingType = null;
-            controllerContextType = null;
-            controllerProcessorType = null;
-
             try
             {
                 controllerSettingType = controller.SettingType();
                 controllerContextType = controller.ContextType();
                 controllerProcessorType = controller.ProcessorType();
             }
-            catch
+            catch (Exception e)
             {
+                Debug.LogWarning($"[ControllerEditor] Failed to resolve controller types: {e.Message}");
                 controllerSettingType = null;
                 controllerContextType = null;
                 controllerProcessorType = null;
             }
         }
 
+        #region ReorderableList
+
         private ReorderableList CreateProcessorList()
         {
-            var list = new ReorderableList(serializedObject, processorsProperty, true, true, true, true)
+            return new ReorderableList(serializedObject, processorsProperty, true, true, true, true)
             {
-                drawHeaderCallback = rect =>
-                {
-                    EditorGUI.LabelField(rect, "Processors");
-                },
-
-                drawElementCallback = (rect, index, active, focused) =>
-                {
-                    var element = processorsProperty.GetArrayElementAtIndex(index);
-                    rect.y += 2;
-
-                    var obj = element.managedReferenceValue;
-                    string label = obj == null ? "Null" : obj.GetType().Name;
-
-                    EditorGUI.LabelField(
-                        new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight),
-                        label, EditorStyles.boldLabel);
-                    rect.y += EditorGUIUtility.singleLineHeight + 2;
-
-                    EditorGUI.PropertyField(rect, element, GUIContent.none, true);
-                },
-
-                elementHeightCallback = index =>
-                {
-                    var element = processorsProperty.GetArrayElementAtIndex(index);
-                    return EditorGUI.GetPropertyHeight(element, true) + 6f;
-                },
-
-                onAddDropdownCallback = (rect, l) =>
-                {
-                    ShowProcessorMenu();
-                },
-
-                onRemoveCallback = l =>
-                {
-                    if (EditorApplication.isPlayingOrWillChangePlaymode)
-                        return;
-
-                    ReorderableList.defaultBehaviours.DoRemoveButton(l);
-                    serializedObject.ApplyModifiedProperties();
-                    EditorUtility.SetDirty(controller);
-                },
-
+                drawHeaderCallback = rect => EditorGUI.LabelField(rect, "Processors"),
+                drawElementCallback = DrawProcessorElement,
+                elementHeightCallback = GetProcessorElementHeight,
+                onAddDropdownCallback = (rect, _) => ShowProcessorMenu(),
+                onRemoveCallback = OnRemoveProcessor,
                 drawNoneElementCallback = rect =>
-                {
-                    EditorGUI.LabelField(rect, "No processors. Add one with +", EditorStyles.centeredGreyMiniLabel);
-                }
+                    EditorGUI.LabelField(rect, "No processors. Add one with +", EditorStyles.centeredGreyMiniLabel)
             };
-
-            return list;
         }
+
+        private void DrawProcessorElement(Rect rect, int index, bool active, bool focused)
+        {
+            var element = processorsProperty.GetArrayElementAtIndex(index);
+            rect.y += 2;
+
+            var obj = element.managedReferenceValue;
+            string label = obj == null ? "Null" : obj.GetType().Name;
+
+            EditorGUI.LabelField(
+                new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight),
+                label, EditorStyles.boldLabel);
+
+            rect.y += EditorGUIUtility.singleLineHeight + 2;
+            EditorGUI.PropertyField(rect, element, GUIContent.none, true);
+        }
+
+        private float GetProcessorElementHeight(int index)
+        {
+            var element = processorsProperty.GetArrayElementAtIndex(index);
+            return EditorGUI.GetPropertyHeight(element, true) + 6f;
+        }
+
+        private void OnRemoveProcessor(ReorderableList list)
+        {
+            if (EditorApplication.isPlayingOrWillChangePlaymode) return;
+
+            ReorderableList.defaultBehaviours.DoRemoveButton(list);
+            serializedObject.ApplyModifiedProperties();
+            EditorUtility.SetDirty(controller);
+        }
+
+        #endregion
+
+        #region Processor Menu
 
         private void ShowProcessorMenu()
         {
             var menu = new GenericMenu();
             bool any = false;
 
-            foreach (var t in ProcessorCache.ProcessorTypes)
+            foreach (var type in ProcessorCache.ProcessorTypes)
             {
-                if (t == null || t.IsAbstract || t.IsInterface || t.ContainsGenericParameters)
-                    continue;
-
-                if (!IsCompatibleProcessorForController(t))
-                    continue;
-
-                if (ProcessorsAlreadyContainsType(t))
-                    continue;
+                if (!IsValidProcessorCandidate(type)) continue;
+                if (!IsCompatibleProcessor(type)) continue;
+                if (ProcessorAlreadyAdded(type)) continue;
 
                 any = true;
-                var cached = t;
-                menu.AddItem(new GUIContent(t.Name), false, () => AddManagedReference(processorsProperty, cached));
+                var cached = type;
+                menu.AddItem(new GUIContent(type.Name), false, () => AddProcessor(cached));
             }
 
             if (!any)
@@ -139,9 +126,13 @@ namespace AM.Editor
             menu.ShowAsContext();
         }
 
-        private bool IsCompatibleProcessorForController(Type candidate)
+        private static bool IsValidProcessorCandidate(Type type)
         {
-            if (candidate == null) return false;
+            return type != null && !type.IsAbstract && !type.IsInterface && !type.ContainsGenericParameters;
+        }
+
+        private bool IsCompatibleProcessor(Type candidate)
+        {
             if (controllerSettingType == null || controllerContextType == null || controllerProcessorType == null)
                 return false;
 
@@ -154,16 +145,15 @@ namespace AM.Editor
                 if (iface.GetGenericTypeDefinition() != typeof(IProcessor<,>)) continue;
 
                 var args = iface.GetGenericArguments();
-                bool settingMatch = controllerSettingType.IsAssignableFrom(args[0]);
-                bool contextMatch = controllerContextType.IsAssignableFrom(args[1]);
-
-                if (settingMatch && contextMatch) return true;
+                if (controllerSettingType.IsAssignableFrom(args[0]) &&
+                    controllerContextType.IsAssignableFrom(args[1]))
+                    return true;
             }
 
             return false;
         }
 
-        private bool ProcessorsAlreadyContainsType(Type type)
+        private bool ProcessorAlreadyAdded(Type type)
         {
             if (processorsProperty == null) return false;
 
@@ -176,52 +166,57 @@ namespace AM.Editor
             return false;
         }
 
-        private void AddManagedReference(SerializedProperty arrayProperty, Type type)
+        private void AddProcessor(Type type)
         {
-            if (EditorApplication.isPlayingOrWillChangePlaymode)
-                return;
+            if (EditorApplication.isPlayingOrWillChangePlaymode) return;
+            if (!IsValidProcessorCandidate(type)) return;
 
-            if (type == null || type.IsAbstract || type.IsInterface || type.ContainsGenericParameters)
-                return;
-
-            Undo.RecordObject(controller, "Add Element");
             serializedObject.Update();
+            Undo.RecordObject(controller, "Add Processor");
 
-            int index = arrayProperty.arraySize;
-            arrayProperty.InsertArrayElementAtIndex(index);
-            arrayProperty.GetArrayElementAtIndex(index).managedReferenceValue = Activator.CreateInstance(type);
+            int index = processorsProperty.arraySize;
+            processorsProperty.InsertArrayElementAtIndex(index);
+            processorsProperty.GetArrayElementAtIndex(index).managedReferenceValue = Activator.CreateInstance(type);
 
             serializedObject.ApplyModifiedProperties();
             EditorUtility.SetDirty(controller);
         }
 
+        #endregion
+
+        #region Inspector GUI
+
         public override void OnInspectorGUI()
         {
-            if (controller == null)
-                return;
+            if (controller == null) return;
 
             serializedObject.Update();
 
-            GUI.enabled = false;
-            EditorGUILayout.ObjectField("Script",
-                MonoScript.FromMonoBehaviour((MonoBehaviour)target),
-                typeof(MonoScript), false);
-            GUI.enabled = true;
+            DrawScriptField();
 
             GUILayout.Space(8);
-
             processorList?.DoLayoutList();
-            GUILayout.Space(6);
 
+            GUILayout.Space(6);
             if (settingsRootProperty != null)
                 EditorGUILayout.PropertyField(settingsRootProperty, true);
 
             GUILayout.Space(6);
-
             if (contextsRootProperty != null)
                 EditorGUILayout.PropertyField(contextsRootProperty, true);
 
             serializedObject.ApplyModifiedProperties();
         }
+
+        private void DrawScriptField()
+        {
+            GUI.enabled = false;
+            EditorGUILayout.ObjectField("Script",
+                MonoScript.FromMonoBehaviour((MonoBehaviour)target),
+                typeof(MonoScript), false);
+            GUI.enabled = true;
+        }
+
+        #endregion
     }
 }

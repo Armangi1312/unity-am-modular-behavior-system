@@ -1,14 +1,13 @@
 {
-    "name": "AM.Editor",
+    "name": "AM.Editor.Node",
     "rootNamespace": "",
     "references": [
+        "GUID:eb06bea051ae7a549882dd5ac6301e01",
         "GUID:fafeef20e3931f345975669a2f9f7ca1",
-        "GUID:ca937d03ee5dd4d699091438dc0f3ae6",
-        "GUID:a432eb0a70c5c4a37ab50d59671586f8"
+        "GUID:c58f1dcd65284e544a4ab76742f58402",
+        "GUID:b0fccbb64a33568409b5bc27a38b084f"
     ],
-    "includePlatforms": [
-        "Editor"
-    ],
+    "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
