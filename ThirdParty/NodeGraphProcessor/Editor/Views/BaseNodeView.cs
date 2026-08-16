@@ -549,23 +549,31 @@ namespace GraphProcessor
 			}
 		}
 
-		public void OpenNodeViewScript()
-		{
-			var script = NodeProvider.GetNodeViewScript(GetType());
+        public void OpenNodeViewScript()
+        {
+            var script = NodeProvider.GetNodeViewScript(GetType());
 
-			if (script != null)
+            if (script != null)
+#if UNITY_6000_3_OR_NEWER
+                AssetDatabase.OpenAsset(script.GetEntityId(), 0, 0);
+#else
 				AssetDatabase.OpenAsset(script.GetInstanceID(), 0, 0);
-		}
+#endif
+        }
 
-		public void OpenNodeScript()
-		{
-			var script = NodeProvider.GetNodeScript(nodeTarget.GetType());
+        public void OpenNodeScript()
+        {
+            var script = NodeProvider.GetNodeScript(nodeTarget.GetType());
 
-			if (script != null)
-				AssetDatabase.OpenAsset(script.GetInstanceID(), 0, 0);
-		}
+            if (script != null)
+#if UNITY_6000_3_OR_NEWER
+                AssetDatabase.OpenAsset(script.GetEntityId(), 0, 0);
+#else
+			    AssetDatabase.OpenAsset(script.GetInstanceID(), 0, 0);
+#endif
+        }
 
-		public void ToggleDebug()
+        public void ToggleDebug()
 		{
 			nodeTarget.debug = !nodeTarget.debug;
 			UpdateDebugView();

@@ -408,14 +408,19 @@ namespace GraphProcessor
 			}
 		}
 
-		void ViewTransformChangedCallback(GraphView view)
-		{
-			if (graph != null)
-			{
-				graph.position = viewTransform.position;
-				graph.scale = viewTransform.scale;
-			}
-		}
+        void ViewTransformChangedCallback(GraphView view)
+        {
+            if (graph != null)
+            {
+#if UNITY_6000_2_OR_NEWER
+                graph.position = contentViewContainer.resolvedStyle.translate;
+                graph.scale = contentViewContainer.resolvedStyle.scale.value;
+#else
+        graph.position = viewTransform.position;
+        graph.scale = viewTransform.scale;
+#endif
+            }
+        }
 
         void ElementResizedCallback(VisualElement elem)
         {
@@ -821,17 +826,22 @@ namespace GraphProcessor
 		protected virtual BaseEdgeConnectorListener CreateEdgeConnectorListener()
 		 => new BaseEdgeConnectorListener(this);
 
-		void InitializeGraphView()
-		{
-			graph.onExposedParameterListChanged += OnExposedParameterListChanged;
-			graph.onExposedParameterModified += (s) => onExposedParameterModified?.Invoke(s);
-			graph.onGraphChanges += GraphChangesCallback;
+        void InitializeGraphView()
+        {
+            graph.onExposedParameterListChanged += OnExposedParameterListChanged;
+            graph.onExposedParameterModified += (s) => onExposedParameterModified?.Invoke(s);
+            graph.onGraphChanges += GraphChangesCallback;
+#if UNITY_6000_2_OR_NEWER
+            contentViewContainer.style.translate = new Translate(graph.position.x, graph.position.y);
+            contentViewContainer.style.scale = new Scale(new Vector2(graph.scale.x, graph.scale.y));
+#else
 			viewTransform.position = graph.position;
 			viewTransform.scale = graph.scale;
-			nodeCreationRequest = (c) => SearchWindow.Open(new SearchWindowContext(c.screenMousePosition), createNodeMenu);
-		}
+#endif
+            nodeCreationRequest = (c) => SearchWindow.Open(new SearchWindowContext(c.screenMousePosition), createNodeMenu);
+        }
 
-		void OnExposedParameterListChanged()
+        void OnExposedParameterListChanged()
 		{
 			UpdateSerializedProperties();
 			onExposedParameterListChanged?.Invoke();

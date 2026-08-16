@@ -67,8 +67,13 @@ namespace GraphProcessor
             {
                 if (!resetPositionOnPan || didConnect)
                 {
+#if UNITY_6000_2_OR_NEWER
+                    Vector3 p = graphView.contentViewContainer.resolvedStyle.translate;
+                    Vector3 s = graphView.contentViewContainer.resolvedStyle.scale.value;
+#else
                     Vector3 p = graphView.contentViewContainer.transform.position;
                     Vector3 s = graphView.contentViewContainer.transform.scale;
+#endif
                     graphView.UpdateViewTransform(p, s);
                 }
             }
@@ -267,7 +272,14 @@ namespace GraphProcessor
 
         private void Pan(TimerState ts)
         {
+#if UNITY_6000_2_OR_NEWER
+            graphView.contentViewContainer.style.translate = new Translate(
+                graphView.contentViewContainer.resolvedStyle.translate.x - panDiff.x,
+                graphView.contentViewContainer.resolvedStyle.translate.y - panDiff.y
+            );
+#else
             graphView.viewTransform.position -= panDiff;
+#endif
 
             // Workaround to force edge to update when we pan the graph
             edgeCandidate.output = edgeCandidate.output;

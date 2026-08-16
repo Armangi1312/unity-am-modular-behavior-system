@@ -14,33 +14,67 @@ MonoBehaviour:
   m_EditorClassIdentifier: AM.Node::AM.Core.Pipelines.Node.PipelineNodeGraph
   serializedNodes: []
   nodes:
-  - rid: 9093382481042735168
-  - rid: 9093382481042735169
-  - rid: 9093382481042735171
-  - rid: 9093382481042735173
-  - rid: 9093382504838070509
-  - rid: 9093382504838070510
+  - rid: 9093382782514364416
+  - rid: 9093382782514364417
+  - rid: 9093382782514364418
+  - rid: 9093382782514364419
+  - rid: 9093382782514364420
+  - rid: 9093382782514364421
+  - rid: 9093382782514364423
+  - rid: 9093382782514364425
   edges:
-  - GUID: 1503fdae-cb8f-4e18-961a-d98d2a2163e0
+  - GUID: 44b71e13-3246-4c43-b6d2-61dc3f9a1d7c
     owner: {fileID: 11400000}
-    inputNodeGUID: 56b4abb7-42eb-4d2f-a1ba-413bdf1b43b1
-    outputNodeGUID: f9e15438-6f92-44fe-a4ad-bb1bb0a5d5b6
+    inputNodeGUID: 271d7e92-2699-45e9-838e-f710408001bf
+    outputNodeGUID: 5b1d3a46-3d0f-4b28-8fc5-d72df3b1436e
     inputFieldName: InputPipeline
     outputFieldName: NextPipeline
     inputPortIdentifier: 
     outputPortIdentifier: 
-  - GUID: 5b15e54a-ee39-4e65-98fa-3262967c4a2d
+  - GUID: b22b1d90-0754-41f0-8157-dd77df76c404
     owner: {fileID: 11400000}
-    inputNodeGUID: bb011d4e-62ae-4d70-9ebb-bfc8ecb9c479
-    outputNodeGUID: 56b4abb7-42eb-4d2f-a1ba-413bdf1b43b1
+    inputNodeGUID: 271d7e92-2699-45e9-838e-f710408001bf
+    outputNodeGUID: 08e98ade-4825-4efb-8290-7ae0247b9bdf
+    inputFieldName: Condition
+    outputFieldName: Output
+    inputPortIdentifier: 
+    outputPortIdentifier: 
+  - GUID: e23e0e62-fd92-4efb-823b-9954ce5961fc
+    owner: {fileID: 11400000}
+    inputNodeGUID: 08e98ade-4825-4efb-8290-7ae0247b9bdf
+    outputNodeGUID: 0e2255e5-4da2-404a-802b-13517acbf903
+    inputFieldName: A
+    outputFieldName: Output
+    inputPortIdentifier: 
+    outputPortIdentifier: 
+  - GUID: 38a99c8f-c8e4-4d1c-a7fb-809760ea7829
+    owner: {fileID: 11400000}
+    inputNodeGUID: 08e98ade-4825-4efb-8290-7ae0247b9bdf
+    outputNodeGUID: f6585497-80d6-4607-8a6c-68dc33b4ab6b
+    inputFieldName: B
+    outputFieldName: Output
+    inputPortIdentifier: 
+    outputPortIdentifier: 
+  - GUID: e47e97bf-99bd-4b7a-8a8c-1ccf1d8f94df
+    owner: {fileID: 11400000}
+    inputNodeGUID: 5f8f72b7-4a38-41cf-a8fc-6ec228233977
+    outputNodeGUID: 271d7e92-2699-45e9-838e-f710408001bf
+    inputFieldName: InputPipeline
+    outputFieldName: NextPipeline
+    inputPortIdentifier: 
+    outputPortIdentifier: 
+  - GUID: edb1f4ca-21d5-4f7c-b6b4-30481be9f1f3
+    owner: {fileID: 11400000}
+    inputNodeGUID: 657e7331-45d2-4184-b6ec-97f82f0e9c25
+    outputNodeGUID: 271d7e92-2699-45e9-838e-f710408001bf
     inputFieldName: InputPipeline
     outputFieldName: TruePipeline
     inputPortIdentifier: 
     outputPortIdentifier: 
-  - GUID: 2d61f46c-592e-47b5-a571-aab681da78c5
+  - GUID: 26d03fab-0683-43f0-89f7-5ce2bfd59c1a
     owner: {fileID: 11400000}
-    inputNodeGUID: 9f4e8df4-866e-46c0-accc-8e24316b92c7
-    outputNodeGUID: 56b4abb7-42eb-4d2f-a1ba-413bdf1b43b1
+    inputNodeGUID: 2e4c5e10-4971-4d70-93ec-a38d4a4cb40e
+    outputNodeGUID: 271d7e92-2699-45e9-838e-f710408001bf
     inputFieldName: InputPipeline
     outputFieldName: FalsePipeline
     inputPortIdentifier: 
@@ -52,116 +86,151 @@ MonoBehaviour:
   serializedParameterList: []
   stickyNotes: []
   nodeInspectorReference: {fileID: 0}
-  position: {x: -312, y: -428, z: 0}
-  scale: {x: 1.520875, y: 1.520875, z: 1}
+  position: {x: 72, y: -325, z: 0}
+  scale: {x: 1.3225, y: 1.3225, z: 1}
   controllerReference:
     targetID: GlobalObjectId_V1-2-99c9720ab356a0642a771bea13969a05-1990664143-0
     target: {fileID: 0}
   references:
     version: 2
     RefIds:
-    - rid: 9093382481042735168
+    - rid: 9093382782514364416
       type: {class: EntryNode, ns: AM.Node.Pipelines, asm: AM.Node}
       data:
         nodeCustomName: 
-        GUID: f9e15438-6f92-44fe-a4ad-bb1bb0a5d5b6
+        GUID: 5b1d3a46-3d0f-4b28-8fc5-d72df3b1436e
         computeOrder: 0
         position:
           serializedVersion: 2
-          x: 391
-          y: 364.5
+          x: 299.49677
+          y: 307.35687
           width: 108
           height: 95
         expanded: 0
         debug: 0
         nodeLock: 0
-    - rid: 9093382481042735169
+    - rid: 9093382782514364417
       type: {class: ConditionNode, ns: AM.Node.Pipelines, asm: AM.Node}
       data:
         nodeCustomName: 
-        GUID: 56b4abb7-42eb-4d2f-a1ba-413bdf1b43b1
-        computeOrder: 1
-        position:
-          serializedVersion: 2
-          x: 699
-          y: 366.5
-          width: 152
-          height: 123
-        expanded: 1
-        debug: 0
-        nodeLock: 0
-        Condition: 0
-    - rid: 9093382481042735171
-      type: {class: ParallelNode, ns: AM.Node.Pipelines, asm: AM.Node}
-      data:
-        nodeCustomName: 
-        GUID: bb011d4e-62ae-4d70-9ebb-bfc8ecb9c479
-        computeOrder: 2
-        position:
-          serializedVersion: 2
-          x: 919.5333
-          y: 338.23398
-          width: 156
-          height: 179.00003
-        expanded: 0
-        debug: 0
-        nodeLock: 0
-        Processors:
-        - rid: 9093382481042735172
-    - rid: 9093382481042735172
-      type: {class: TestProcessor1, ns: , asm: Assembly-CSharp}
-      data: 
-    - rid: 9093382481042735173
-      type: {class: ParallelNode, ns: AM.Node.Pipelines, asm: AM.Node}
-      data:
-        nodeCustomName: 
-        GUID: 9f4e8df4-866e-46c0-accc-8e24316b92c7
-        computeOrder: 3
-        position:
-          serializedVersion: 2
-          x: 919.7017
-          y: 519.5718
-          width: 157.99994
-          height: 179.00006
-        expanded: 0
-        debug: 0
-        nodeLock: 0
-        Processors:
-        - rid: 9093382481042735174
-    - rid: 9093382481042735174
-      type: {class: TestProcessor2, ns: , asm: Assembly-CSharp}
-      data: 
-    - rid: 9093382504838070509
-      type: {class: FloatNode, ns: AM.Node.Math.Primitives, asm: AM.Node}
-      data:
-        nodeCustomName: 
-        GUID: d34ef50d-d1b9-4dc6-ae98-32bbbe6a5ecf
+        GUID: 271d7e92-2699-45e9-838e-f710408001bf
         computeOrder: 4
         position:
           serializedVersion: 2
-          x: 330
-          y: 459
-          width: 71
-          height: 94
+          x: 544.26086
+          y: 292.34784
+          width: 152.00012
+          height: 123
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        Condition: 0
+    - rid: 9093382782514364418
+      type: {class: ComparisonNode, ns: AM.Node.Math.Operators, asm: AM.Node}
+      data:
+        nodeCustomName: 
+        GUID: 08e98ade-4825-4efb-8290-7ae0247b9bdf
+        computeOrder: 3
+        position:
+          serializedVersion: 2
+          x: 331.02478
+          y: 442.46536
+          width: 191.00006
+          height: 117.99997
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        Output: 0
+        ComparisonType: 0
+    - rid: 9093382782514364419
+      type: {class: BoolNode, ns: AM.Node.Math.Primitives, asm: AM.Node}
+      data:
+        nodeCustomName: 
+        GUID: 0e2255e5-4da2-404a-802b-13517acbf903
+        computeOrder: 2
+        position:
+          serializedVersion: 2
+          x: 175.2745
+          y: 444.16602
+          width: 67
+          height: 93
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        Output: 0
+        Input: 1
+    - rid: 9093382782514364420
+      type: {class: BoolNode, ns: AM.Node.Math.Primitives, asm: AM.Node}
+      data:
+        nodeCustomName: 
+        GUID: f6585497-80d6-4607-8a6c-68dc33b4ab6b
+        computeOrder: 1
+        position:
+          serializedVersion: 2
+          x: 175.21048
+          y: 550.83527
+          width: 67
+          height: 93
         expanded: 0
         debug: 0
         nodeLock: 0
         Output: 0
         Input: 0
-    - rid: 9093382504838070510
-      type: {class: IntNode, ns: AM.Node.Math.Primitives, asm: AM.Node}
+    - rid: 9093382782514364421
+      type: {class: ParallelNode, ns: AM.Node.Pipelines, asm: AM.Node}
       data:
         nodeCustomName: 
-        GUID: dbd7bdc1-ff5a-4350-a2b7-24c11d2f9479
+        GUID: 5f8f72b7-4a38-41cf-a8fc-6ec228233977
         computeOrder: 5
         position:
           serializedVersion: 2
-          x: 334
-          y: 574
-          width: 59
-          height: 94
+          x: 819
+          y: 314
+          width: 124
+          height: 179
         expanded: 0
         debug: 0
         nodeLock: 0
-        Output: 0
-        Input: 0
+        Processors:
+        - rid: 9093382782514364422
+    - rid: 9093382782514364422
+      type: {class: TestProcessor1, ns: , asm: Assembly-CSharp}
+      data: 
+    - rid: 9093382782514364423
+      type: {class: ParallelNode, ns: AM.Node.Pipelines, asm: AM.Node}
+      data:
+        nodeCustomName: 
+        GUID: 657e7331-45d2-4184-b6ec-97f82f0e9c25
+        computeOrder: 6
+        position:
+          serializedVersion: 2
+          x: 811.414
+          y: 425.38565
+          width: 124
+          height: 95.99997
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        Processors:
+        - rid: 9093382782514364424
+        - rid: 9093382782514364422
+    - rid: 9093382782514364424
+      type: {class: TestProcessor2, ns: , asm: Assembly-CSharp}
+      data: 
+    - rid: 9093382782514364425
+      type: {class: ParallelNode, ns: AM.Node.Pipelines, asm: AM.Node}
+      data:
+        nodeCustomName: 
+        GUID: 2e4c5e10-4971-4d70-93ec-a38d4a4cb40e
+        computeOrder: 7
+        position:
+          serializedVersion: 2
+          x: 808.5369
+          y: 517.89795
+          width: 124
+          height: 96
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        Processors:
+        - rid: 9093382782514364424

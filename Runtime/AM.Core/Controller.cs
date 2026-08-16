@@ -13,15 +13,6 @@ namespace AM.Core
 {
     public abstract class Controller : MonoBehaviour
     {
-#if UNITY_EDITOR
-        public abstract Type SettingType();
-        public abstract Type ContextType();
-        public abstract Type ProcessorType();
-
-        public abstract object GetSetting();
-        public abstract object GetContext();
-        public abstract object GetProcessor();
-#endif
     }
 
     public abstract class Controller<TSetting, TContext, TProcessor> : Controller
@@ -36,7 +27,7 @@ namespace AM.Core
 
         public Registry<TSetting> Settings => settings;
         public Registry<TContext> Contexts => contexts;
-        public IReadOnlyList<TProcessor> Processors => processors;
+        public List<TProcessor> Processors => processors;
         public IPipeline Pipeline => pipeline;
 
         protected bool Initialized;
@@ -86,7 +77,6 @@ namespace AM.Core
             if (Initialized) return;
             Initialized = true;
 
-            EnsureCollections();
             ValidateRuntimeDependencies();
             InitializeProcessors();
 
@@ -119,17 +109,17 @@ namespace AM.Core
 
         #region Dependency Validation
 
-        private void CollectDependencies(HashSet<Type> ctx, HashSet<Type> set)
+        private void CollectDependencies(HashSet<Type> context, HashSet<Type> setting)
         {
             foreach (var processor in processors)
             {
                 if (processor == null) continue;
 
                 foreach (var t in ProcessorDependencyValidator.GetRequiredContexts(processor.GetType()))
-                    ctx.Add(t);
+                    context.Add(t);
 
                 foreach (var t in ProcessorDependencyValidator.GetRequiredSettings(processor.GetType()))
-                    set.Add(t);
+                    setting.Add(t);
             }
         }
 
@@ -138,15 +128,13 @@ namespace AM.Core
             foreach (var type in requiredContexts)
             {
                 if (!typeof(TContext).IsAssignableFrom(type))
-                    throw new InvalidOperationException(
-                        $"Context '{type.Name}' is not compatible with controller context '{typeof(TContext).Name}'.");
+                    throw new InvalidOperationException($"Context '{type.Name}' is not compatible with controller context '{typeof(TContext).Name}'.");
             }
 
             foreach (var type in requiredSettings)
             {
                 if (!typeof(TSetting).IsAssignableFrom(type))
-                    throw new InvalidOperationException(
-                        $"Setting '{type.Name}' is not compatible with controller setting '{typeof(TSetting).Name}'.");
+                    throw new InvalidOperationException($"Setting '{type.Name}' is not compatible with controller setting '{typeof(TSetting).Name}'.");
             }
         }
 
@@ -162,13 +150,6 @@ namespace AM.Core
         #endregion
 
         #region Registry
-
-        private void EnsureCollections()
-        {
-            settings ??= new();
-            contexts ??= new();
-            processors ??= new();
-        }
 
         private bool SyncRegistry<T>(Registry<T> registry, HashSet<Type> required) where T : class
         {
@@ -209,20 +190,9 @@ namespace AM.Core
         #region Editor
 
 #if UNITY_EDITOR
-
-        public override object GetSetting() => settings;
-        public override object GetContext() => contexts;
-        public override object GetProcessor() => processors;
-
-        public override Type SettingType() => typeof(TSetting);
-        public override Type ContextType() => typeof(TContext);
-        public override Type ProcessorType() => typeof(TProcessor);
-
         private void OnValidate()
         {
             if (Application.isPlaying) return;
-
-            EnsureCollections();
 
             bool changed = false;
             changed |= RemoveDuplicateRegistryEntries(contexts);

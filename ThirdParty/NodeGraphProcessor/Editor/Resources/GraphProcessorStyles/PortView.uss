@@ -47,32 +47,40 @@ PortView > #connector > #cap:hover
     background-color: #f0f0f0;
 }
 
-.Port_Boolean {
-    --port-color: #ff6d29;
+.Port_Int32 {
+	--port-color: #84E4E7;
 }
 
 .Port_Single {
-    --port-color: #2080FF;
+	--port-color: #84E4E7;
 }
 
-.Port_Int32 {
-    --port-color: #325dff;
+.Port_Boolean {
+	--port-color: #8F7DDD;
+}
+
+.Port_Vector2 {
+	--port-color: #96E98E;
+}
+
+.Port_Vector3 {
+	--port-color: #ECF494;
+}
+
+.Port_Vector4 {
+	--port-color: #F4C6ED;
 }
 
 .Port_Object {
-    --port-color: #80FF00;
-}
-
-.Port_String {
-    --port-color: #80FF80;
-}
-
-.Port_GameObject {
-    --port-color: #FF0000;
+	--port-color: #E08282;
 }
 
 .Port_Color {
-    --port-color: #FF00FF;
+	--port-color: #F4C6ED;
+}
+
+.Port_PipelineFlow {
+	--port-color: #8AD8A2;
 }
 
 .Vertical

@@ -8,18 +8,29 @@ namespace AM.Editor.Node
 {
     public class PipelineNodeGraphWindow : BaseGraphWindow
     {
+#if UNITY_6000_3_OR_NEWER
         [OnOpenAsset(0)]
-        public static bool OnGraphOpened(int instanceID, int line)
+        public static bool OnGraphOpened(EntityId entityId, int line)
         {
-            #pragma warning disable CS0618
-            var asset = EditorUtility.InstanceIDToObject(instanceID) as PipelineNodeGraph;
-            #pragma warning restore CS0618
+            var asset = EditorUtility.EntityIdToObject(entityId) as PipelineNodeGraph;
 
             if (asset == null) return false;
 
             GetWindow<PipelineNodeGraphWindow>().InitializeGraph(asset);
             return true;
         }
+#else
+        [OnOpenAsset(0)]
+        public static bool OnGraphOpened(int instanceID, int line)
+        {
+            var asset = EditorUtility.InstanceIDToObject(instanceID) as PipelineNodeGraph;
+
+            if (asset == null) return false;
+
+            GetWindow<PipelineNodeGraphWindow>().InitializeGraph(asset);
+            return true;
+        }
+#endif
 
         protected override void InitializeWindow(BaseGraph graph)
         {

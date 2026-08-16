@@ -52,19 +52,32 @@ namespace GraphProcessor
 			visualStyle = badgeText.GetHashCode().ToString();
 		}
 
-		protected override void ExecuteDefaultAction(EventBase evt)
-		{
-			// When the mouse enter the icon, this will add the label to the hierarchy
-			base.ExecuteDefaultAction(evt);
+#if UNITY_2023_2_OR_NEWER
+        protected override void HandleEventBubbleUp(EventBase evt)
+        {
+            base.HandleEventBubbleUp(evt);
 
             if (evt.eventTypeId == MouseEnterEvent.TypeId())
-			{
-				// And then we can fetch it here:
-				GraphView gv = GetFirstAncestorOfType<GraphView>();
-				var label = gv.Q<Label>(classes: new string[]{"icon-badge__text--" + badgeText.GetHashCode()});
-				if (label != null)
-					label.style.color = color;
-			}
-		}
-	}
+            {
+                GraphView gv = GetFirstAncestorOfType<GraphView>();
+                var label = gv.Q<Label>(classes: new string[] { "icon-badge__text--" + badgeText.GetHashCode() });
+                if (label != null)
+                    label.style.color = color;
+            }
+        }
+#else
+        protected override void ExecuteDefaultAction(EventBase evt)
+        {
+            base.ExecuteDefaultAction(evt);
+
+            if (evt.eventTypeId == MouseEnterEvent.TypeId())
+            {
+                GraphView gv = GetFirstAncestorOfType<GraphView>();
+                var label = gv.Q<Label>(classes: new string[]{"icon-badge__text--" + badgeText.GetHashCode()});
+                if (label != null)
+                    label.style.color = color;
+            }
+        }
+#endif
+    }
 }
