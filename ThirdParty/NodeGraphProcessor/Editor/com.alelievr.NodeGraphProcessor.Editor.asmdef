@@ -1,0 +1,24 @@
+{
+    "name": "com.alelievr.NodeGraphProcessor.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:3275b29aab67b134eb7e009153685e80"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "Unity",
+            "expression": "6000.0.58",
+            "define": "UNITY_6000_0_58_OR_NEWER"
+        }
+    ],
+    "noEngineReferences": false
+}

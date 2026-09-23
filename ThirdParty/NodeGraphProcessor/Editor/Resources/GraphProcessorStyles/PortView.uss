@@ -1,0 +1,89 @@
+PortView {
+    height: 24px;
+    align-items: center;
+    padding-left: 4px;
+    padding-right: 4px;
+}
+
+PortView.input {
+    flex-direction: row;
+}
+
+PortView.output {
+    flex-direction: row-reverse;
+}
+
+PortView > #connector {
+    border-color: rgb(255, 255, 0);
+    background-color: #212121;
+    width: 8px;
+    height: 8px;
+    border-radius: 8px;
+    align-items: center;
+    justify-content: center;
+
+    margin-left: 4px;
+    margin-right: 4px;
+    border-left-width:1px;
+    border-top-width:1px;
+    border-right-width:1px;
+    border-bottom-width:1px;
+}
+
+PortView > #connector:hover {
+    border-color:  #f0f0f0
+}
+
+PortView > #connector > #cap
+{
+    background-color: #212121;
+    width: 4px;
+    height: 4px;
+    border-radius: 4px;
+}
+
+PortView > #connector > #cap:hover
+{
+    background-color: #f0f0f0;
+}
+
+.Port_Int32 {
+	--port-color: #84E4E7;
+}
+
+.Port_Single {
+	--port-color: #84E4E7;
+}
+
+.Port_Boolean {
+	--port-color: #8F7DDD;
+}
+
+.Port_Vector2 {
+	--port-color: #96E98E;
+}
+
+.Port_Vector3 {
+	--port-color: #ECF494;
+}
+
+.Port_Vector4 {
+	--port-color: #F4C6ED;
+}
+
+.Port_Object {
+	--port-color: #E08282;
+}
+
+.Port_Color {
+	--port-color: #F4C6ED;
+}
+
+.Port_PipelineFlow {
+	--port-color: #8AD8A2;
+}
+
+.Vertical
+{
+    height: 6px;
+}
