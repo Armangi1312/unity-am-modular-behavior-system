@@ -1,3 +1,7 @@
+> [!WARNING]
+> This project has been archived. Please use [AMBehaviorSystem](https://github.com/Armangi1312/AMBehaviorSystem) for the source generation-based pipeline system and new APIs.
+
+
 # Unity Modular Behavior System
 
 ## 1. Overview
